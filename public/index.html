@@ -935,8 +935,10 @@ window.promptDeleteKey = (id, name) => {
 window.deleteKey = async (id) => {
   const { error } = await supa.from('api_keys').delete().eq('id', id)
   if (error) { showToast('Erro ao revogar: ' + error.message, true); return }
+  _state.keys = _state.keys.filter(k => k.id !== id)
+  renderKeys(); updateStats()
   showToast('Chave revogada')
-  await loadKeys()
+  loadKeys()
 }
 
 // ─── Webhooks ──────────────────────────────────────────────────────────
@@ -1018,8 +1020,10 @@ window.promptDeleteWebhook = (id, url) => {
 window.deleteWebhook = async (id) => {
   const { error } = await supa.from('webhooks').delete().eq('id', id)
   if (error) { showToast('Erro: ' + error.message, true); return }
+  _state.webhooks = _state.webhooks.filter(w => w.id !== id)
+  renderWebhooks(); updateStats()
   showToast('Webhook removido')
-  await loadWebhooks()
+  loadWebhooks()
 }
 
 // ─── Accounts ─────────────────────────────────────────────────────────
