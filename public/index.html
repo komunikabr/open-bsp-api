@@ -439,13 +439,18 @@ print(res.json())</pre>
       </div>
 
       <div id="webhooks-list" class="space-y-3"></div>
-      <div id="webhooks-empty" class="hidden bg-[#10101e] border border-[#1e1e30] rounded-xl p-12 text-center">
-        <div class="w-12 h-12 rounded-xl bg-[#1a1a2a] flex items-center justify-center mx-auto mb-4">
-          <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <div id="webhooks-empty" class="hidden bg-[#10101e] border border-dashed border-[#2a2a40] rounded-xl p-12 flex flex-col items-center justify-center text-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-[#0d0d1a] border border-[#1e1e30] flex items-center justify-center">
+          <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
         </div>
-        <p class="text-gray-400 text-sm font-medium mb-1">Nenhum webhook configurado</p>
-        <p class="text-gray-600 text-xs mb-4">Crie um webhook para sua app receber eventos de mensagens</p>
-        <button onclick="openNewWebhookModal()" class="text-xs text-brand-400 hover:text-brand-300 font-medium transition">+ Criar primeiro webhook</button>
+        <div>
+          <div class="text-sm font-semibold text-gray-300 mb-1">Nenhum webhook configurado</div>
+          <div class="text-xs text-gray-500 max-w-xs">Configure um endpoint para sua aplicação receber eventos de mensagens e conversas em tempo real.</div>
+        </div>
+        <button onclick="openNewWebhookModal()" class="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          Criar primeiro webhook
+        </button>
       </div>
     </div>
 
@@ -838,7 +843,20 @@ async function loadKeys() {
 function renderKeys() {
   const el = $('keys-list')
   if (!_state.keys.length) {
-    el.innerHTML = `<div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-10 text-center text-sm text-gray-500">Nenhuma API Key ainda. Crie uma para começar a integrar.</div>`
+    el.innerHTML = `
+      <div class="bg-[#10101e] border border-dashed border-[#2a2a40] rounded-xl p-12 flex flex-col items-center justify-center text-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-[#0d0d1a] border border-[#1e1e30] flex items-center justify-center">
+          <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        </div>
+        <div>
+          <div class="text-sm font-semibold text-gray-300 mb-1">Nenhuma API Key criada</div>
+          <div class="text-xs text-gray-500 max-w-xs">Crie sua primeira chave para autenticar as chamadas à API do MsgHub na sua aplicação.</div>
+        </div>
+        <button onclick="openNewKeyModal()" class="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          Criar primeira API Key
+        </button>
+      </div>`
     return
   }
   el.innerHTML = _state.keys.map(k => `
