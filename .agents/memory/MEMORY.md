@@ -1,2 +1,3 @@
 - [MsgHub Portal Architecture](msghub-portal.md) — RLS usa tabela `agents` (não orgs) para checar permissão; trigger cria owner ao inserir org
 - [MsgHub migration](msghub-migration.md) — Supabase→Neon+Drizzle, Supabase Auth→Replit OIDC, Deno→Node/Express; key gotchas documented.
+- [OpenBSP Replit Rules](openbsp-replit-rules.md) — stack é Deno+Supabase; Replit só para edição; nunca instalar Replit Auth/Neon/Drizzle/Node
