@@ -1,0 +1,1 @@
+- [MsgHub Portal Architecture](msghub-portal.md) — RLS usa tabela `agents` (não orgs) para checar permissão; trigger cria owner ao inserir org
