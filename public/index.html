@@ -670,13 +670,20 @@ print(res.json())</pre>
 
 <!-- ════════ SCRIPT ════════ -->
 <script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.54'
 
-const cfg = await fetch('/api/config').then(r => r.json())
+// ─── API helpers ──────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' }, credentials: 'include' }
+  if (body !== undefined) opts.body = JSON.stringify(body)
+  const r = await fetch('/api' + path, opts)
+  if (r.status === 401) { redirectToLogin(); return null }
+  return r
+}
+async function apiGet(path)        { return api('GET',    path) }
+async function apiPost(path, body) { return api('POST',   path, body) }
+async function apiDel(path)        { return api('DELETE', path) }
 
-const supa = createClient(window.location.origin + '/proxy', cfg.anonKey, {
-  auth: { persistSession: true, autoRefreshToken: true, storageKey: 'msghub-session' }
-})
+function redirectToLogin() { window.location.href = '/api/login' }
 
 let _state = { org: null, keys: [], webhooks: [], user: null }
 
@@ -741,44 +748,38 @@ document.getElementById('confirm-input').addEventListener('input', (e) => {
 
 // ─── Boot ──────────────────────────────────────────────────────────────
 async function boot() {
-  const { data:{ session } } = await supa.auth.getSession()
-  if (session) await enter(session.user)
-  else { showV('login'); showLogin() }
-  supa.auth.onAuthStateChange(async (ev, session) => {
-    if (ev === 'SIGNED_IN' && session) await enter(session.user)
-    if (ev === 'SIGNED_OUT') { showV('login'); showLogin() }
-  })
+  const r = await fetch('/api/auth/user', { credentials: 'include' })
+  if (r.status === 401) {
+    showV('login')
+    return
+  }
+  const user = await r.json()
+  await enter(user)
 }
 
 async function enter(user) {
   _state.user = user
   showV('dashboard')
   const email = user.email ?? ''
-  document.getElementById('user-email-display').textContent = email
-  document.getElementById('user-avatar').textContent = email.charAt(0).toUpperCase() || '?'
+  const name = [user.firstName, user.lastName].filter(Boolean).join(' ') || email
+  document.getElementById('user-email-display').textContent = name || email
+  document.getElementById('user-avatar').textContent = (name || email).charAt(0).toUpperCase() || '?'
 
   // Load or create organization
   let org = null
   try {
-    const { data, error } = await supa.from('organizations').select('*').limit(1)
-    if (error) { console.error('Org fetch error:', error); }
-    if (data?.length) {
-      org = data[0]
+    const orgsR = await apiGet('/organizations')
+    if (!orgsR) return
+    const orgs = await orgsR.json()
+    if (orgs.length) {
+      org = orgs[0]
     } else {
-      const orgName = user.user_metadata?.org_name || email.split('@')[0] || 'Minha Aplicação'
-      const { data: created, error: createErr } = await supa
-        .from('organizations')
-        .insert({ name: orgName, extra: { response_delay_seconds: 0 } })
-        .select()
-        .single()
-      if (createErr) {
-        console.error('Org create error:', createErr)
-        showToast('Erro ao configurar organização: ' + createErr.message, true)
+      const orgName = email.split('@')[0] || 'Minha Aplicação'
+      const createR = await apiPost('/organizations', { name: orgName })
+      if (createR && createR.ok) {
+        org = await createR.json()
       } else {
-        org = created
-        await new Promise(r => setTimeout(r, 800))
-        const { data: refetched } = await supa.from('organizations').select('*').limit(1)
-        if (refetched?.length) org = refetched[0]
+        showToast('Erro ao configurar organização.', true)
       }
     }
   } catch (e) {
@@ -799,44 +800,18 @@ async function enter(user) {
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────
-window.handleSignIn = async () => {
-  const email = document.getElementById('login-email').value.trim()
-  const pw    = document.getElementById('login-password').value
-  const err   = document.getElementById('login-error')
-  err.classList.add('hidden')
-  if (!email || !pw) { showErr(err, 'Preencha e-mail e senha.'); return }
-  const btn = document.getElementById('btn-signin')
-  btn.textContent = 'Entrando…'; btn.disabled = true
-  const { error } = await supa.auth.signInWithPassword({ email, password: pw })
-  btn.textContent = 'Entrar'; btn.disabled = false
-  if (error) showErr(err, error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message)
-}
-
-window.handleSignUp = async () => {
-  const org  = document.getElementById('signup-org').value.trim()
-  const email= document.getElementById('signup-email').value.trim()
-  const pw   = document.getElementById('signup-password').value
-  const err  = document.getElementById('signup-error')
-  const ok   = document.getElementById('signup-success')
-  err.classList.add('hidden'); ok.classList.add('hidden')
-  if (!org||!email||!pw) { showErr(err,'Preencha todos os campos.'); return }
-  if (pw.length < 8)     { showErr(err,'Senha mínima de 8 caracteres.'); return }
-  const { error } = await supa.auth.signUp({ email, password: pw, options:{ data:{ org_name: org } } })
-  if (error) { showErr(err, error.message); return }
-  ok.classList.remove('hidden'); ok.textContent = 'Conta criada! Entrando…'
-  await supa.auth.signInWithPassword({ email, password: pw })
-}
-
-window.handleSignOut = async () => await supa.auth.signOut()
+window.handleSignIn = () => { window.location.href = '/api/login' }
+window.handleSignUp = () => { window.location.href = '/api/login' }
+window.handleSignOut = () => { window.location.href = '/api/logout' }
 window.showLogin  = () => { $('login-form').classList.remove('hidden'); $('signup-form').classList.add('hidden') }
 window.showSignUp = () => { $('signup-form').classList.remove('hidden'); $('login-form').classList.add('hidden') }
 
 // ─── API Keys ──────────────────────────────────────────────────────────
 async function loadKeys() {
   if (!_state.org) return
-  const { data, error } = await supa.from('api_keys').select('*').eq('organization_id', _state.org.id).order('created_at')
-  if (error) { console.error('loadKeys error:', error); return }
-  _state.keys = data ?? []
+  const r = await apiGet('/api-keys')
+  if (!r) return
+  _state.keys = await r.json()
   renderKeys(); updateStats()
 }
 
@@ -907,25 +882,15 @@ window.createApiKey = async () => {
   const btn = $('btn-create-key')
   btn.textContent = 'Gerando…'; btn.disabled = true
 
-  const key = 'mh_' + Array.from(crypto.getRandomValues(new Uint8Array(24)))
-    .map(b => b.toString(16).padStart(2, '0')).join('')
-
-  const { data, error } = await supa
-    .from('api_keys')
-    .insert({ organization_id: _state.org.id, name, role, key })
-    .select()
-    .single()
-
+  const r = await apiPost('/api-keys', { name, role })
   btn.textContent = 'Gerar Chave'; btn.disabled = false
 
-  if (error) {
-    console.error('createApiKey error:', error)
-    const msg = error.code === '42501'
-      ? 'Sem permissão para criar API Keys. Verifique se sua conta está configurada corretamente.'
-      : error.message
-    showErr(err, msg)
+  if (!r || !r.ok) {
+    const body = r ? await r.json().catch(() => ({})) : {}
+    showErr(err, body.error || 'Erro ao criar API Key.')
     return
   }
+  const data = await r.json()
   $('created-key-value').textContent = data.key
   $('created-key-box').classList.remove('hidden')
   $('btn-create-key').classList.add('hidden')
@@ -951,20 +916,19 @@ window.promptDeleteKey = (id, name) => {
   )
 }
 window.deleteKey = async (id) => {
-  const { error } = await supa.from('api_keys').delete().eq('id', id)
-  if (error) { showToast('Erro ao revogar: ' + error.message, true); return }
+  const r = await apiDel(`/api-keys/${id}`)
+  if (!r || !r.ok) { showToast('Erro ao revogar a chave.', true); return }
   _state.keys = _state.keys.filter(k => k.id !== id)
   renderKeys(); updateStats()
   showToast('Chave revogada')
-  loadKeys()
 }
 
 // ─── Webhooks ──────────────────────────────────────────────────────────
 async function loadWebhooks() {
   if (!_state.org) return
-  const { data, error } = await supa.from('webhooks').select('*').eq('organization_id', _state.org.id).order('created_at')
-  if (error) { console.error('loadWebhooks error:', error); return }
-  _state.webhooks = data ?? []
+  const r = await apiGet('/webhooks')
+  if (!r) return
+  _state.webhooks = await r.json()
   renderWebhooks(); updateStats()
 }
 

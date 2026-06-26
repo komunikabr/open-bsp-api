@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "deno-2"]
+modules = ["nodejs-20", "web", "bash"]
 [agent]
 expertMode = true
 stack = "BEST_EFFORT_FALLBACK"
@@ -32,7 +32,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "deno run --allow-net --allow-read --allow-env server.ts"
+args = "npm run dev"
 waitForPort = 5000
 
 [deployment]
