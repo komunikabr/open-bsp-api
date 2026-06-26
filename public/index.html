@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenBSP — Portal do Desenvolvedor</title>
+  <title>MsgHub — Portal do Desenvolvedor</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -11,1024 +11,951 @@
       theme: {
         extend: {
           colors: {
-            brand: { 50:'#fdf4ee', 100:'#fae4d0', 200:'#f5c59f', 300:'#eda06d', 400:'#e47a3d', 500:'#C26A3D', 600:'#a85530', 700:'#8a4326', 800:'#6e3420', 900:'#591f12' }
+            brand: {
+              50:'#eef6ff', 100:'#d9eaff', 200:'#bcd8ff', 300:'#8ec0ff',
+              400:'#599dfc', 500:'#3b7ef8', 600:'#2260ed', 700:'#1a4dd9',
+              800:'#1c3fad', 900:'#1c3889'
+            }
           }
         }
       }
     }
   </script>
   <style>
-    [x-cloak] { display: none !important; }
-    .tab-active { border-bottom: 2px solid #C26A3D; color: #C26A3D; }
-    .copy-btn:active { transform: scale(0.95); }
-    .fade-in { animation: fadeIn 0.2s ease; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-    .badge-soon { background: #1e1b4b; color: #a5b4fc; font-size: 0.65rem; padding: 2px 8px; border-radius: 99px; font-weight: 600; letter-spacing: 0.05em; }
-    .badge-new  { background: #052e16; color: #4ade80; font-size: 0.65rem; padding: 2px 8px; border-radius: 99px; font-weight: 600; letter-spacing: 0.05em; }
-    .skeleton { background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-track { background:#111; } ::-webkit-scrollbar-thumb { background:#333; border-radius:9px; }
+    .nav-active { background: rgba(59,126,248,0.12); color:#7fb3fc; font-weight:500; }
+    .fade-in { animation: fi 0.18s ease; }
+    @keyframes fi { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+    .copy-btn:active { transform:scale(0.93); }
+    .badge-soon { background:#1e1b4b;color:#a5b4fc;font-size:.65rem;padding:2px 8px;border-radius:99px;font-weight:600;letter-spacing:.05em; }
+    .badge-live  { background:#052e16;color:#4ade80;font-size:.65rem;padding:2px 8px;border-radius:99px;font-weight:600;letter-spacing:.05em; }
+    ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:#0d0d0d} ::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:4px}
+    input,select { color-scheme: dark; }
   </style>
 </head>
-<body class="bg-[#0a0a0a] text-gray-100 min-h-screen font-sans">
-
-<!-- ════════════════════════════════ APP ════════════════════════════════ -->
+<body class="bg-[#080810] text-gray-100 min-h-screen font-sans">
 <div id="app">
 
-  <!-- ── LOGIN ─────────────────────────────────────────────────────────── -->
-  <div id="view-login" class="hidden min-h-screen flex items-center justify-center px-4">
-    <div class="w-full max-w-sm">
-      <div class="flex items-center gap-3 mb-8">
-        <div class="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-lg">B</div>
-        <span class="text-xl font-bold tracking-tight">OpenBSP</span>
+<!-- ════════ LOGIN ════════ -->
+<div id="view-login" class="hidden min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+    <div class="flex items-center gap-3 mb-8">
+      <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
       </div>
-      <div class="bg-[#141414] border border-[#242424] rounded-2xl p-8">
-        <h1 class="text-xl font-semibold mb-1">Entrar no Portal</h1>
-        <p class="text-sm text-gray-500 mb-6">Acesse sua conta de desenvolvedor</p>
-
-        <div id="login-form">
-          <label class="block text-xs text-gray-400 mb-1 font-medium">E-mail</label>
-          <input id="login-email" type="email" placeholder="voce@empresa.com"
-            class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 mb-4 transition" />
-
-          <label class="block text-xs text-gray-400 mb-1 font-medium">Senha</label>
-          <input id="login-password" type="password" placeholder="••••••••"
-            class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 mb-5 transition" />
-
-          <div id="login-error" class="hidden text-red-400 text-xs mb-4 bg-red-900/20 border border-red-900/40 rounded-lg px-3 py-2"></div>
-
-          <button id="btn-signin" onclick="handleSignIn()"
-            class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg py-2.5 text-sm transition mb-3">
-            Entrar
-          </button>
-          <button onclick="showSignUp()"
-            class="w-full border border-[#2e2e2e] hover:border-[#3e3e3e] text-gray-300 font-medium rounded-lg py-2.5 text-sm transition">
-            Criar conta
-          </button>
-        </div>
-
-        <div id="signup-form" class="hidden">
-          <label class="block text-xs text-gray-400 mb-1 font-medium">Nome da empresa</label>
-          <input id="signup-org" type="text" placeholder="Minha Empresa Ltda"
-            class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 mb-4 transition" />
-
-          <label class="block text-xs text-gray-400 mb-1 font-medium">E-mail</label>
-          <input id="signup-email" type="email" placeholder="voce@empresa.com"
-            class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 mb-4 transition" />
-
-          <label class="block text-xs text-gray-400 mb-1 font-medium">Senha</label>
-          <input id="signup-password" type="password" placeholder="Mín. 8 caracteres"
-            class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 mb-5 transition" />
-
-          <div id="signup-error" class="hidden text-red-400 text-xs mb-4 bg-red-900/20 border border-red-900/40 rounded-lg px-3 py-2"></div>
-          <div id="signup-success" class="hidden text-green-400 text-xs mb-4 bg-green-900/20 border border-green-900/40 rounded-lg px-3 py-2"></div>
-
-          <button onclick="handleSignUp()"
-            class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg py-2.5 text-sm transition mb-3">
-            Criar conta
-          </button>
-          <button onclick="showLogin()"
-            class="w-full border border-[#2e2e2e] hover:border-[#3e3e3e] text-gray-300 font-medium rounded-lg py-2.5 text-sm transition">
-            Já tenho conta
-          </button>
-        </div>
+      <div>
+        <div class="text-lg font-bold tracking-tight">MsgHub</div>
+        <div class="text-xs text-gray-500">Portal do Desenvolvedor</div>
       </div>
-      <p class="text-center text-xs text-gray-600 mt-4">Ambiente local · Supabase na porta 54321</p>
     </div>
-  </div>
 
-  <!-- ── DASHBOARD ──────────────────────────────────────────────────────── -->
-  <div id="view-dashboard" class="hidden">
+    <div class="bg-[#12121e] border border-[#1e1e30] rounded-2xl p-7">
+      <!-- SIGN IN -->
+      <div id="login-form">
+        <h1 class="text-lg font-semibold mb-0.5">Entrar</h1>
+        <p class="text-xs text-gray-500 mb-6">Acesse sua conta para gerenciar a integração</p>
+        <label class="block text-xs text-gray-400 font-medium mb-1">E-mail</label>
+        <input id="login-email" type="email" placeholder="dev@suaempresa.com"
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 mb-4 transition"/>
+        <label class="block text-xs text-gray-400 font-medium mb-1">Senha</label>
+        <input id="login-password" type="password" placeholder="••••••••"
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 mb-5 transition"/>
+        <div id="login-error" class="hidden text-red-400 text-xs mb-4 bg-red-900/20 border border-red-900/30 rounded-lg px-3 py-2"></div>
+        <button id="btn-signin" onclick="handleSignIn()"
+          class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg py-2.5 text-sm transition mb-3">Entrar</button>
+        <button onclick="showSignUp()"
+          class="w-full border border-[#252535] hover:border-[#353545] text-gray-400 hover:text-gray-200 font-medium rounded-lg py-2.5 text-sm transition">Criar conta</button>
+      </div>
 
-    <!-- Sidebar -->
-    <div class="flex h-screen overflow-hidden">
-      <aside class="w-56 bg-[#0f0f0f] border-r border-[#1e1e1e] flex flex-col shrink-0">
-        <div class="px-5 py-5 border-b border-[#1e1e1e]">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-sm">B</div>
-            <div>
-              <div class="text-sm font-semibold">OpenBSP</div>
-              <div class="text-xs text-gray-500">Portal Dev</div>
-            </div>
-          </div>
-        </div>
-
-        <nav class="flex-1 px-3 py-4 space-y-0.5">
-          <button onclick="setTab('overview')" id="nav-overview"
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition text-left">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-            Visão Geral
-          </button>
-          <button onclick="setTab('credentials')" id="nav-credentials"
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition text-left">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-            Credenciais
-          </button>
-          <button onclick="setTab('endpoints')" id="nav-endpoints"
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition text-left">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-            Endpoints
-          </button>
-          <button onclick="setTab('webhooks')" id="nav-webhooks"
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition text-left">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-            Webhooks
-          </button>
-
-          <div class="border-t border-[#1e1e1e] pt-3 mt-3">
-            <p class="px-3 text-xs text-gray-600 font-medium mb-1.5 uppercase tracking-wider">Serviços</p>
-            <button onclick="setTab('services')" id="nav-services"
-              class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition text-left">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-              Catálogo
-            </button>
-          </div>
-        </nav>
-
-        <div class="px-3 pb-4 border-t border-[#1e1e1e] pt-3">
-          <div class="flex items-center gap-2.5 px-3 py-2">
-            <div class="w-7 h-7 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 text-xs font-bold" id="user-avatar">?</div>
-            <div class="flex-1 min-w-0">
-              <div class="text-xs font-medium truncate" id="user-email-display">—</div>
-            </div>
-            <button onclick="handleSignOut()" title="Sair"
-              class="text-gray-500 hover:text-gray-300 transition">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Main content -->
-      <main class="flex-1 overflow-y-auto bg-[#0a0a0a]">
-
-        <!-- ── TAB: VISÃO GERAL ──────────────────────────────────────────── -->
-        <div id="tab-overview" class="hidden fade-in">
-          <div class="px-8 py-8 max-w-4xl">
-            <div class="mb-8">
-              <h1 class="text-2xl font-bold mb-1" id="org-name-title">Minha Organização</h1>
-              <p class="text-sm text-gray-500">Bem-vindo ao seu painel de integração WhatsApp Business</p>
-            </div>
-
-            <!-- Stats -->
-            <div class="grid grid-cols-3 gap-4 mb-8">
-              <div class="bg-[#141414] border border-[#242424] rounded-xl p-5">
-                <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">API Keys</div>
-                <div class="text-3xl font-bold" id="stat-keys">—</div>
-              </div>
-              <div class="bg-[#141414] border border-[#242424] rounded-xl p-5">
-                <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Webhooks</div>
-                <div class="text-3xl font-bold" id="stat-webhooks">—</div>
-              </div>
-              <div class="bg-[#141414] border border-[#242424] rounded-xl p-5">
-                <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Contas WA</div>
-                <div class="text-3xl font-bold" id="stat-accounts">—</div>
-              </div>
-            </div>
-
-            <!-- Quick start -->
-            <div class="bg-[#141414] border border-[#242424] rounded-xl p-6 mb-6">
-              <h2 class="text-sm font-semibold mb-4 flex items-center gap-2">
-                <svg class="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                Início Rápido
-              </h2>
-              <div class="space-y-3">
-                <div class="flex items-start gap-3">
-                  <div id="qs-key" class="w-5 h-5 rounded-full border-2 border-gray-600 flex items-center justify-center shrink-0 mt-0.5">
-                    <div class="w-2 h-2 rounded-full bg-gray-600"></div>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium">Crie uma API Key</div>
-                    <div class="text-xs text-gray-500">Gere credenciais para autenticar suas chamadas</div>
-                  </div>
-                </div>
-                <div class="flex items-start gap-3">
-                  <div id="qs-webhook" class="w-5 h-5 rounded-full border-2 border-gray-600 flex items-center justify-center shrink-0 mt-0.5">
-                    <div class="w-2 h-2 rounded-full bg-gray-600"></div>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium">Configure um Webhook</div>
-                    <div class="text-xs text-gray-500">Receba notificações de mensagens e conversas</div>
-                  </div>
-                </div>
-                <div class="flex items-start gap-3">
-                  <div class="w-5 h-5 rounded-full border-2 border-gray-600 flex items-center justify-center shrink-0 mt-0.5">
-                    <div class="w-2 h-2 rounded-full bg-gray-600"></div>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium">Conecte uma conta WhatsApp</div>
-                    <div class="text-xs text-gray-500">Adicione seu número via painel do Supabase</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Org ID -->
-            <div class="bg-[#141414] border border-[#242424] rounded-xl p-6">
-              <h2 class="text-sm font-semibold mb-4">Identificação da Organização</h2>
-              <div>
-                <label class="text-xs text-gray-500 block mb-1">Organization ID</label>
-                <div class="flex items-center gap-2">
-                  <code class="flex-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-xs text-brand-300 font-mono" id="org-id-display">—</code>
-                  <button onclick="copy('org-id-display')" class="copy-btn text-gray-500 hover:text-gray-300 transition p-2 rounded-lg hover:bg-white/5">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── TAB: CREDENCIAIS ───────────────────────────────────────────── -->
-        <div id="tab-credentials" class="hidden fade-in">
-          <div class="px-8 py-8 max-w-4xl">
-            <div class="flex items-center justify-between mb-8">
-              <div>
-                <h1 class="text-2xl font-bold mb-1">Credenciais</h1>
-                <p class="text-sm text-gray-500">Gerencie as chaves de API da sua organização</p>
-              </div>
-              <button onclick="openNewKeyModal()"
-                class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Nova API Key
-              </button>
-            </div>
-
-            <div id="keys-list" class="space-y-3 mb-8"></div>
-
-            <!-- Supabase keys section -->
-            <div class="bg-[#141414] border border-[#242424] rounded-xl p-6">
-              <h2 class="text-sm font-semibold mb-1">Chaves do Supabase</h2>
-              <p class="text-xs text-gray-500 mb-5">Para uso com a biblioteca @supabase/supabase-js</p>
-
-              <div class="space-y-4">
-                <div>
-                  <label class="text-xs text-gray-400 font-medium block mb-1.5">Project URL</label>
-                  <div class="flex gap-2">
-                    <code class="flex-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-xs font-mono text-green-400" id="supa-url">http://127.0.0.1:54321</code>
-                    <button onclick="copy('supa-url')" class="copy-btn text-gray-500 hover:text-gray-300 p-2 rounded-lg hover:bg-white/5 transition">
-                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <label class="text-xs text-gray-400 font-medium block mb-1.5">Anon Key (pública)</label>
-                  <div class="flex gap-2">
-                    <code class="flex-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-xs font-mono text-green-400 break-all" id="supa-anon">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0</code>
-                    <button onclick="copy('supa-anon')" class="copy-btn text-gray-500 hover:text-gray-300 p-2 rounded-lg hover:bg-white/5 transition shrink-0">
-                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── TAB: ENDPOINTS ────────────────────────────────────────────── -->
-        <div id="tab-endpoints" class="hidden fade-in">
-          <div class="px-8 py-8 max-w-4xl">
-            <div class="mb-8">
-              <h1 class="text-2xl font-bold mb-1">Endpoints de Integração</h1>
-              <p class="text-sm text-gray-500">URLs prontas para integrar na sua aplicação</p>
-            </div>
-
-            <!-- REST API -->
-            <div class="bg-[#141414] border border-[#242424] rounded-xl p-6 mb-4">
-              <div class="flex items-center gap-2 mb-4">
-                <div class="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  <svg class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                </div>
-                <h2 class="text-sm font-semibold">REST API</h2>
-              </div>
-              <div class="space-y-3">
-                <div id="ep-rest" class="endpoint-row"></div>
-                <div id="ep-graphql" class="endpoint-row"></div>
-              </div>
-            </div>
-
-            <!-- Edge Functions -->
-            <div class="bg-[#141414] border border-[#242424] rounded-xl p-6 mb-4">
-              <div class="flex items-center gap-2 mb-4">
-                <div class="w-7 h-7 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                  <svg class="w-4 h-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <h2 class="text-sm font-semibold">Edge Functions</h2>
-              </div>
-              <div class="space-y-3">
-                <div id="ep-webhook" class="endpoint-row"></div>
-                <div id="ep-dispatcher" class="endpoint-row"></div>
-                <div id="ep-management" class="endpoint-row"></div>
-                <div id="ep-agent" class="endpoint-row"></div>
-                <div id="ep-mcp" class="endpoint-row"></div>
-              </div>
-            </div>
-
-            <!-- Realtime -->
-            <div class="bg-[#141414] border border-[#242424] rounded-xl p-6 mb-4">
-              <div class="flex items-center gap-2 mb-4">
-                <div class="w-7 h-7 rounded-lg bg-green-500/10 flex items-center justify-center">
-                  <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <h2 class="text-sm font-semibold">Database & Auth</h2>
-              </div>
-              <div class="space-y-3">
-                <div id="ep-db" class="endpoint-row"></div>
-                <div id="ep-auth" class="endpoint-row"></div>
-                <div id="ep-storage" class="endpoint-row"></div>
-              </div>
-            </div>
-
-            <!-- Code snippet -->
-            <div class="bg-[#141414] border border-[#242424] rounded-xl p-6">
-              <h2 class="text-sm font-semibold mb-4">Exemplo de uso</h2>
-              <pre class="bg-[#0f0f0f] border border-[#222] rounded-lg p-4 text-xs font-mono text-gray-300 overflow-x-auto"><span class="text-purple-400">import</span> <span class="text-gray-300">{ createClient }</span> <span class="text-purple-400">from</span> <span class="text-green-400">'@supabase/supabase-js'</span>
-
-<span class="text-purple-400">const</span> <span class="text-blue-400">supabase</span> = createClient(
-  <span class="text-green-400" id="code-url">'http://127.0.0.1:54321'</span>,
-  <span class="text-green-400">'&lt;SUA_API_KEY&gt;'</span>  <span class="text-gray-500">// use api-key header</span>
-)
-
-<span class="text-gray-500">// Listar mensagens da organização</span>
-<span class="text-purple-400">const</span> { data } = <span class="text-purple-400">await</span> supabase
-  .from(<span class="text-green-400">'messages'</span>)
-  .select(<span class="text-green-400">'*'</span>)
-  .order(<span class="text-green-400">'created_at'</span>, { ascending: <span class="text-orange-400">false</span> })
-  .limit(<span class="text-orange-400">20</span>)</pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── TAB: WEBHOOKS ──────────────────────────────────────────────── -->
-        <div id="tab-webhooks" class="hidden fade-in">
-          <div class="px-8 py-8 max-w-4xl">
-            <div class="flex items-center justify-between mb-8">
-              <div>
-                <h1 class="text-2xl font-bold mb-1">Webhooks</h1>
-                <p class="text-sm text-gray-500">Configure URLs para receber eventos em tempo real</p>
-              </div>
-              <button onclick="openNewWebhookModal()"
-                class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Novo Webhook
-              </button>
-            </div>
-
-            <!-- Info box -->
-            <div class="bg-blue-900/10 border border-blue-900/30 rounded-xl p-4 mb-6 flex gap-3">
-              <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              <div class="text-xs text-blue-300">
-                <strong class="font-semibold">Como funciona:</strong> quando um evento ocorrer (mensagem recebida, conversa atualizada), o OpenBSP fará um <code class="bg-blue-900/30 px-1 rounded">POST</code> para a URL configurada com o payload JSON do evento. Use o token para validar a autenticidade.
-              </div>
-            </div>
-
-            <div id="webhooks-list" class="space-y-3"></div>
-
-            <!-- Empty state -->
-            <div id="webhooks-empty" class="hidden bg-[#141414] border border-[#242424] rounded-xl p-12 text-center">
-              <div class="w-12 h-12 rounded-xl bg-[#1e1e1e] flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-              </div>
-              <p class="text-gray-400 text-sm font-medium mb-1">Nenhum webhook configurado</p>
-              <p class="text-gray-600 text-xs">Crie um webhook para receber eventos da plataforma</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── TAB: SERVIÇOS ──────────────────────────────────────────────── -->
-        <div id="tab-services" class="hidden fade-in">
-          <div class="px-8 py-8 max-w-4xl">
-            <div class="mb-8">
-              <h1 class="text-2xl font-bold mb-1">Catálogo de Serviços</h1>
-              <p class="text-sm text-gray-500">Adicione funcionalidades prontas à sua integração WhatsApp</p>
-            </div>
-
-            <!-- Active services -->
-            <div class="mb-6">
-              <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Disponível Agora</h2>
-              <div class="grid grid-cols-2 gap-4">
-                <div class="bg-[#141414] border border-[#242424] rounded-xl p-5">
-                  <div class="flex items-start justify-between mb-3">
-                    <div class="w-9 h-9 rounded-xl bg-green-500/10 flex items-center justify-center">
-                      <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                    </div>
-                    <span class="badge-new">ATIVO</span>
-                  </div>
-                  <h3 class="font-semibold text-sm mb-1">INBOX</h3>
-                  <p class="text-xs text-gray-500 mb-4">Caixa de entrada multi-agente com suporte a conversas, tags e histórico completo.</p>
-                  <a href="https://github.com/matiasbattocchia/open-bsp-ui" target="_blank"
-                    class="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1 transition">
-                    Ver OpenBSP UI
-                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                  </a>
-                </div>
-
-                <div class="bg-[#141414] border border-[#242424] rounded-xl p-5">
-                  <div class="flex items-start justify-between mb-3">
-                    <div class="w-9 h-9 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                      <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                    </div>
-                    <span class="badge-new">ATIVO</span>
-                  </div>
-                  <h3 class="font-semibold text-sm mb-1">AI Agents</h3>
-                  <p class="text-xs text-gray-500 mb-4">Agentes de IA com suporte a OpenAI, Anthropic, Gemini. Ferramentas: MCP, SQL, HTTP, Calculadora.</p>
-                  <button onclick="setTab('overview')" class="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1 transition">
-                    Configurar agente
-                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Coming soon -->
-            <div>
-              <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Em Breve</h2>
-              <div class="grid grid-cols-2 gap-4">
-
-                <div class="bg-[#141414] border border-[#242424] rounded-xl p-5 opacity-70">
-                  <div class="flex items-start justify-between mb-3">
-                    <div class="w-9 h-9 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                      <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    </div>
-                    <span class="badge-soon">EM BREVE</span>
-                  </div>
-                  <h3 class="font-semibold text-sm mb-1">OTP via WhatsApp</h3>
-                  <p class="text-xs text-gray-500">Envie senhas de uso único para autenticação dos seus usuários via WhatsApp. Alta deliverability, sem SMS.</p>
-                </div>
-
-                <div class="bg-[#141414] border border-[#242424] rounded-xl p-5 opacity-70">
-                  <div class="flex items-start justify-between mb-3">
-                    <div class="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center">
-                      <svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                    </div>
-                    <span class="badge-soon">EM BREVE</span>
-                  </div>
-                  <h3 class="font-semibold text-sm mb-1">Recuperação de Carrinho</h3>
-                  <p class="text-xs text-gray-500">Recupere vendas perdidas com mensagens automáticas de lembrete de carrinho abandonado via WhatsApp.</p>
-                </div>
-
-                <div class="bg-[#141414] border border-[#242424] rounded-xl p-5 opacity-70">
-                  <div class="flex items-start justify-between mb-3">
-                    <div class="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center">
-                      <svg class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                    </div>
-                    <span class="badge-soon">EM BREVE</span>
-                  </div>
-                  <h3 class="font-semibold text-sm mb-1">Canal Email</h3>
-                  <p class="text-xs text-gray-500">Receba e envie e-mails pelo mesmo pipeline de mensagens. Arquitetura simétrica ao WhatsApp via Cloudflare Email.</p>
-                </div>
-
-                <div class="bg-[#141414] border border-[#242424] rounded-xl p-5 opacity-70">
-                  <div class="flex items-start justify-between mb-3">
-                    <div class="w-9 h-9 rounded-xl bg-pink-500/10 flex items-center justify-center">
-                      <svg class="w-5 h-5 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </div>
-                    <span class="badge-soon">EM BREVE</span>
-                  </div>
-                  <h3 class="font-semibold text-sm mb-1">Instagram DM</h3>
-                  <p class="text-xs text-gray-500">Gerencie mensagens diretas do Instagram no mesmo painel, com os mesmos agentes e webhooks.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </main>
+      <!-- SIGN UP -->
+      <div id="signup-form" class="hidden">
+        <h1 class="text-lg font-semibold mb-0.5">Criar conta</h1>
+        <p class="text-xs text-gray-500 mb-6">Cadastre sua aplicação na plataforma</p>
+        <label class="block text-xs text-gray-400 font-medium mb-1">Nome da aplicação</label>
+        <input id="signup-org" type="text" placeholder="Minha App de Atendimento"
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 mb-4 transition"/>
+        <label class="block text-xs text-gray-400 font-medium mb-1">E-mail</label>
+        <input id="signup-email" type="email" placeholder="dev@suaempresa.com"
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 mb-4 transition"/>
+        <label class="block text-xs text-gray-400 font-medium mb-1">Senha</label>
+        <input id="signup-password" type="password" placeholder="Mín. 8 caracteres"
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 mb-5 transition"/>
+        <div id="signup-error"   class="hidden text-red-400   text-xs mb-4 bg-red-900/20   border border-red-900/30   rounded-lg px-3 py-2"></div>
+        <div id="signup-success" class="hidden text-green-400 text-xs mb-4 bg-green-900/20 border border-green-900/30 rounded-lg px-3 py-2"></div>
+        <button onclick="handleSignUp()"
+          class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg py-2.5 text-sm transition mb-3">Criar conta</button>
+        <button onclick="showLogin()"
+          class="w-full border border-[#252535] hover:border-[#353545] text-gray-400 hover:text-gray-200 font-medium rounded-lg py-2.5 text-sm transition">Já tenho conta</button>
+      </div>
     </div>
+    <p class="text-center text-xs text-gray-700 mt-4">MsgHub · Plataforma de Mensageria Empresarial</p>
   </div>
-
 </div>
 
-<!-- ── MODAL: NOVA API KEY ────────────────────────────────────────────── -->
-<div id="modal-key" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-  <div class="bg-[#141414] border border-[#2a2a2a] rounded-2xl p-6 w-full max-w-md fade-in">
-    <h2 class="text-base font-semibold mb-1">Nova API Key</h2>
-    <p class="text-xs text-gray-500 mb-5">A chave será exibida apenas uma vez. Guarde em local seguro.</p>
+<!-- ════════ DASHBOARD ════════ -->
+<div id="view-dashboard" class="hidden flex h-screen overflow-hidden">
 
-    <div class="space-y-4 mb-6">
-      <div>
-        <label class="text-xs text-gray-400 font-medium block mb-1">Nome da chave</label>
-        <input id="new-key-name" type="text" placeholder="ex: Produção, Staging, Chatbot"
-          class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition" />
-      </div>
-      <div>
-        <label class="text-xs text-gray-400 font-medium block mb-1">Permissão</label>
-        <select id="new-key-role"
-          class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition text-gray-200">
-          <option value="member">member — leitura de mensagens e contatos</option>
-          <option value="admin">admin — + gerenciar webhooks</option>
-          <option value="owner">owner — acesso total</option>
-        </select>
+  <!-- Sidebar -->
+  <aside class="w-56 bg-[#0c0c18] border-r border-[#1a1a2a] flex flex-col shrink-0">
+    <div class="px-5 py-5 border-b border-[#1a1a2a]">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        </div>
+        <div>
+          <div class="text-sm font-bold tracking-tight">MsgHub</div>
+          <div class="text-xs text-gray-600">Portal Dev</div>
+        </div>
       </div>
     </div>
 
-    <!-- Created key display -->
-    <div id="created-key-box" class="hidden bg-green-900/10 border border-green-900/40 rounded-xl p-4 mb-5">
-      <p class="text-xs text-green-400 font-semibold mb-2 flex items-center gap-1">
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-        Chave criada! Copie agora.
-      </p>
-      <div class="flex gap-2">
-        <code class="flex-1 bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg px-3 py-2 text-xs font-mono text-green-300 break-all" id="created-key-value"></code>
-        <button onclick="copy('created-key-value')" class="copy-btn text-gray-500 hover:text-gray-300 p-2 rounded-lg hover:bg-white/5 shrink-0 transition">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+    <nav class="flex-1 px-2 py-4 space-y-0.5">
+      <button onclick="setTab('overview')" id="nav-overview" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Visão Geral
+      </button>
+      <button onclick="setTab('credentials')" id="nav-credentials" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        API Keys
+      </button>
+      <button onclick="setTab('endpoints')" id="nav-endpoints" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        Endpoints
+      </button>
+      <button onclick="setTab('webhooks')" id="nav-webhooks" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        Webhooks
+      </button>
+      <div class="border-t border-[#1a1a2a] pt-3 mt-2">
+        <p class="px-3 text-xs text-gray-600 font-semibold mb-1.5 uppercase tracking-wider">Serviços</p>
+        <button onclick="setTab('services')" id="nav-services" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          Catálogo
+        </button>
+      </div>
+    </nav>
+
+    <div class="px-3 py-3 border-t border-[#1a1a2a]">
+      <div class="flex items-center gap-2 px-2 py-1.5">
+        <div class="w-7 h-7 rounded-full bg-brand-700/40 flex items-center justify-center text-brand-300 text-xs font-bold shrink-0" id="user-avatar">?</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-gray-400 truncate" id="user-email-display">—</div>
+        </div>
+        <button onclick="handleSignOut()" title="Sair" class="text-gray-600 hover:text-gray-300 transition shrink-0">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
         </button>
       </div>
     </div>
+  </aside>
 
-    <div id="key-modal-error" class="hidden text-red-400 text-xs mb-4 bg-red-900/20 border border-red-900/40 rounded-lg px-3 py-2"></div>
+  <!-- Main -->
+  <main class="flex-1 overflow-y-auto bg-[#080810]">
 
+    <!-- ── VISÃO GERAL ──────────────────────────────────────────── -->
+    <div id="tab-overview" class="hidden fade-in max-w-4xl px-8 py-8">
+      <div class="mb-7">
+        <h1 class="text-2xl font-bold mb-1" id="org-name-title">Minha Aplicação</h1>
+        <p class="text-sm text-gray-500">Gerencie sua integração de mensageria via WhatsApp</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5">
+          <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">API Keys</div>
+          <div class="text-3xl font-bold" id="stat-keys">—</div>
+        </div>
+        <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5">
+          <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Webhooks</div>
+          <div class="text-3xl font-bold" id="stat-webhooks">—</div>
+        </div>
+        <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5">
+          <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Contas WA</div>
+          <div class="text-3xl font-bold" id="stat-accounts">—</div>
+        </div>
+      </div>
+
+      <!-- Quick start -->
+      <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-6 mb-4">
+        <h2 class="text-sm font-semibold mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Início Rápido
+        </h2>
+        <div class="space-y-4">
+          <div class="flex items-start gap-3">
+            <div id="qs-key" class="w-5 h-5 rounded-full border-2 border-[#2e2e45] flex items-center justify-center shrink-0 mt-0.5 transition-all">
+              <div class="w-2 h-2 rounded-full bg-[#2e2e45]"></div>
+            </div>
+            <div>
+              <button onclick="setTab('credentials')" class="text-sm font-medium hover:text-brand-300 transition text-left">Gere uma API Key</button>
+              <div class="text-xs text-gray-500">Autentique todas as chamadas à nossa API com sua chave secreta</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div id="qs-webhook" class="w-5 h-5 rounded-full border-2 border-[#2e2e45] flex items-center justify-center shrink-0 mt-0.5 transition-all">
+              <div class="w-2 h-2 rounded-full bg-[#2e2e45]"></div>
+            </div>
+            <div>
+              <button onclick="setTab('webhooks')" class="text-sm font-medium hover:text-brand-300 transition text-left">Configure seu Webhook</button>
+              <div class="text-xs text-gray-500">Receba eventos de mensagens e conversas na URL da sua aplicação</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-5 h-5 rounded-full border-2 border-[#2e2e45] flex items-center justify-center shrink-0 mt-0.5">
+              <div class="w-2 h-2 rounded-full bg-[#2e2e45]"></div>
+            </div>
+            <div>
+              <button onclick="setTab('endpoints')" class="text-sm font-medium hover:text-brand-300 transition text-left">Explore os Endpoints</button>
+              <div class="text-xs text-gray-500">Envie mensagens, consulte contatos e conversas via nossa REST API</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- App ID -->
+      <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-6">
+        <h2 class="text-sm font-semibold mb-4">Identificação da Aplicação</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-gray-500 block mb-1.5">App ID</label>
+            <div class="flex items-center gap-2">
+              <code class="flex-1 bg-[#0d0d1a] border border-[#1e1e30] rounded-lg px-3 py-2 text-xs font-mono text-brand-300 truncate" id="org-id-display">—</code>
+              <button onclick="copy('org-id-display')" class="copy-btn text-gray-600 hover:text-gray-300 p-1.5 rounded-lg hover:bg-white/5 transition shrink-0">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-gray-500 block mb-1.5">Status</label>
+            <div class="flex items-center gap-2 bg-[#0d0d1a] border border-[#1e1e30] rounded-lg px-3 py-2">
+              <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+              <span class="text-xs text-green-400 font-medium">Ativo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── API KEYS ─────────────────────────────────────────────── -->
+    <div id="tab-credentials" class="hidden fade-in max-w-4xl px-8 py-8">
+      <div class="flex items-center justify-between mb-7">
+        <div>
+          <h1 class="text-2xl font-bold mb-1">API Keys</h1>
+          <p class="text-sm text-gray-500">Chaves de autenticação da sua aplicação</p>
+        </div>
+        <button onclick="openNewKeyModal()"
+          class="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          Nova API Key
+        </button>
+      </div>
+
+      <!-- Info -->
+      <div class="bg-blue-900/10 border border-blue-900/25 rounded-xl p-4 mb-6 flex gap-3">
+        <svg class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <p class="text-xs text-blue-300">Passe a API Key no header <code class="bg-blue-900/30 px-1 py-0.5 rounded font-mono">Authorization: Bearer &lt;KEY&gt;</code> em todas as requisições à nossa API.</p>
+      </div>
+
+      <div id="keys-list" class="space-y-3"></div>
+    </div>
+
+    <!-- ── ENDPOINTS ────────────────────────────────────────────── -->
+    <div id="tab-endpoints" class="hidden fade-in max-w-4xl px-8 py-8">
+      <div class="mb-7">
+        <h1 class="text-2xl font-bold mb-1">Endpoints da API</h1>
+        <p class="text-sm text-gray-500">Integre diretamente com nossa REST API — sem se preocupar com a infraestrutura</p>
+      </div>
+
+      <!-- Base URL -->
+      <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5 mb-5">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Base URL</span>
+          <span class="text-xs text-green-400 bg-green-900/20 px-2 py-0.5 rounded-full">v1</span>
+        </div>
+        <div class="flex items-center gap-2 mt-2">
+          <code class="flex-1 bg-[#0d0d1a] border border-[#1e1e30] rounded-lg px-3 py-2.5 text-sm font-mono text-brand-300" id="base-url-display">https://api.msghub.com.br/v1</code>
+          <button onclick="copy('base-url-display')" class="copy-btn text-gray-600 hover:text-gray-300 p-2 rounded-lg hover:bg-white/5 transition shrink-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Endpoint groups -->
+      <div class="space-y-4 mb-6">
+        <!-- Mensagens -->
+        <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl overflow-hidden">
+          <div class="px-5 py-3.5 border-b border-[#1a1a2a] flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+            <span class="text-sm font-semibold">Mensagens</span>
+          </div>
+          <div class="divide-y divide-[#14142a]">
+            <div class="ep-row px-5 py-3 flex items-center gap-3">
+              <span class="method-badge post">POST</span>
+              <code class="text-xs font-mono text-gray-300 flex-1">/messages/send</code>
+              <span class="text-xs text-gray-600">Enviar mensagem de texto ou template</span>
+              <button onclick="copyText('/messages/send')" class="copy-btn text-gray-700 hover:text-gray-400 p-1 rounded transition shrink-0"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+            </div>
+            <div class="ep-row px-5 py-3 flex items-center gap-3">
+              <span class="method-badge get">GET</span>
+              <code class="text-xs font-mono text-gray-300 flex-1">/messages</code>
+              <span class="text-xs text-gray-600">Listar mensagens de uma conversa</span>
+              <button onclick="copyText('/messages')" class="copy-btn text-gray-700 hover:text-gray-400 p-1 rounded transition shrink-0"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversas -->
+        <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl overflow-hidden">
+          <div class="px-5 py-3.5 border-b border-[#1a1a2a] flex items-center gap-2">
+            <svg class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+            <span class="text-sm font-semibold">Conversas</span>
+          </div>
+          <div class="divide-y divide-[#14142a]">
+            <div class="ep-row px-5 py-3 flex items-center gap-3">
+              <span class="method-badge get">GET</span>
+              <code class="text-xs font-mono text-gray-300 flex-1">/conversations</code>
+              <span class="text-xs text-gray-600">Listar conversas ativas</span>
+              <button onclick="copyText('/conversations')" class="copy-btn text-gray-700 hover:text-gray-400 p-1 rounded transition shrink-0"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+            </div>
+            <div class="ep-row px-5 py-3 flex items-center gap-3">
+              <span class="method-badge get">GET</span>
+              <code class="text-xs font-mono text-gray-300 flex-1">/conversations/:id</code>
+              <span class="text-xs text-gray-600">Detalhes de uma conversa</span>
+              <button onclick="copyText('/conversations/:id')" class="copy-btn text-gray-700 hover:text-gray-400 p-1 rounded transition shrink-0"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contatos -->
+        <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl overflow-hidden">
+          <div class="px-5 py-3.5 border-b border-[#1a1a2a] flex items-center gap-2">
+            <svg class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-sm font-semibold">Contatos</span>
+          </div>
+          <div class="divide-y divide-[#14142a]">
+            <div class="ep-row px-5 py-3 flex items-center gap-3">
+              <span class="method-badge get">GET</span>
+              <code class="text-xs font-mono text-gray-300 flex-1">/contacts</code>
+              <span class="text-xs text-gray-600">Buscar contatos por nome ou número</span>
+              <button onclick="copyText('/contacts')" class="copy-btn text-gray-700 hover:text-gray-400 p-1 rounded transition shrink-0"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+            </div>
+            <div class="ep-row px-5 py-3 flex items-center gap-3">
+              <span class="method-badge post">POST</span>
+              <code class="text-xs font-mono text-gray-300 flex-1">/contacts</code>
+              <span class="text-xs text-gray-600">Criar ou atualizar contato</span>
+              <button onclick="copyText('/contacts')" class="copy-btn text-gray-700 hover:text-gray-400 p-1 rounded transition shrink-0"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Templates -->
+        <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl overflow-hidden">
+          <div class="px-5 py-3.5 border-b border-[#1a1a2a] flex items-center gap-2">
+            <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span class="text-sm font-semibold">Templates</span>
+          </div>
+          <div class="divide-y divide-[#14142a]">
+            <div class="ep-row px-5 py-3 flex items-center gap-3">
+              <span class="method-badge get">GET</span>
+              <code class="text-xs font-mono text-gray-300 flex-1">/templates</code>
+              <span class="text-xs text-gray-600">Listar templates aprovados</span>
+              <button onclick="copyText('/templates')" class="copy-btn text-gray-700 hover:text-gray-400 p-1 rounded transition shrink-0"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code example -->
+      <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-[#1a1a2a] flex items-center justify-between">
+          <span class="text-sm font-semibold">Exemplo — Enviar mensagem</span>
+          <div class="flex gap-2">
+            <button onclick="showCodeTab('js')" id="code-tab-js" class="text-xs px-3 py-1 rounded-md bg-brand-600/30 text-brand-300 font-medium">JavaScript</button>
+            <button onclick="showCodeTab('python')" id="code-tab-python" class="text-xs px-3 py-1 rounded-md text-gray-500 hover:text-gray-300 transition font-medium">Python</button>
+            <button onclick="showCodeTab('curl')" id="code-tab-curl" class="text-xs px-3 py-1 rounded-md text-gray-500 hover:text-gray-300 transition font-medium">cURL</button>
+          </div>
+        </div>
+        <div id="code-js" class="p-5">
+<pre class="text-xs font-mono text-gray-300 overflow-x-auto leading-relaxed"><span class="text-purple-400">const</span> <span class="text-blue-300">response</span> = <span class="text-purple-400">await</span> <span class="text-yellow-300">fetch</span>(<span class="text-green-400">'https://api.msghub.com.br/v1/messages/send'</span>, {
+  method: <span class="text-green-400">'POST'</span>,
+  headers: {
+    <span class="text-green-400">'Authorization'</span>: <span class="text-green-400">`Bearer <span class="text-yellow-300">${'<SUA_API_KEY>'}</span>`</span>,
+    <span class="text-green-400">'Content-Type'</span>: <span class="text-green-400">'application/json'</span>
+  },
+  body: <span class="text-yellow-300">JSON</span>.<span class="text-blue-300">stringify</span>({
+    to: <span class="text-green-400">'5511999998888'</span>,
+    message: { text: <span class="text-green-400">'Olá! Como posso ajudar?'</span> }
+  })
+})
+
+<span class="text-purple-400">const</span> <span class="text-blue-300">data</span> = <span class="text-purple-400">await</span> response.<span class="text-blue-300">json</span>()
+<span class="text-yellow-300">console</span>.<span class="text-blue-300">log</span>(data)</pre>
+        </div>
+        <div id="code-python" class="p-5 hidden">
+<pre class="text-xs font-mono text-gray-300 overflow-x-auto leading-relaxed"><span class="text-purple-400">import</span> requests
+
+response = requests.post(
+    <span class="text-green-400">'https://api.msghub.com.br/v1/messages/send'</span>,
+    headers={
+        <span class="text-green-400">'Authorization'</span>: <span class="text-green-400">'Bearer &lt;SUA_API_KEY&gt;'</span>,
+        <span class="text-green-400">'Content-Type'</span>: <span class="text-green-400">'application/json'</span>
+    },
+    json={
+        <span class="text-green-400">'to'</span>: <span class="text-green-400">'5511999998888'</span>,
+        <span class="text-green-400">'message'</span>: {<span class="text-green-400">'text'</span>: <span class="text-green-400">'Olá! Como posso ajudar?'</span>}
+    }
+)
+print(response.json())</pre>
+        </div>
+        <div id="code-curl" class="p-5 hidden">
+<pre class="text-xs font-mono text-gray-300 overflow-x-auto leading-relaxed">curl -X POST https://api.msghub.com.br/v1/messages/send \
+  -H <span class="text-green-400">"Authorization: Bearer &lt;SUA_API_KEY&gt;"</span> \
+  -H <span class="text-green-400">"Content-Type: application/json"</span> \
+  -d <span class="text-green-400">'{
+    "to": "5511999998888",
+    "message": {"text": "Olá! Como posso ajudar?"}
+  }'</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WEBHOOKS ──────────────────────────────────────────────── -->
+    <div id="tab-webhooks" class="hidden fade-in max-w-4xl px-8 py-8">
+      <div class="flex items-center justify-between mb-7">
+        <div>
+          <h1 class="text-2xl font-bold mb-1">Webhooks</h1>
+          <p class="text-sm text-gray-500">Receba eventos em tempo real na URL da sua aplicação</p>
+        </div>
+        <button onclick="openNewWebhookModal()"
+          class="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          Novo Webhook
+        </button>
+      </div>
+
+      <!-- Como funciona -->
+      <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5 mb-5">
+        <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Como funciona</h2>
+        <div class="flex items-center gap-2 text-xs text-gray-400 flex-wrap">
+          <div class="flex items-center gap-1.5 bg-[#0d0d1a] border border-[#1e1e30] rounded-lg px-3 py-2">
+            <svg class="w-3.5 h-3.5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4"/></svg>
+            Cliente envia mensagem WA
+          </div>
+          <svg class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          <div class="flex items-center gap-1.5 bg-[#0d0d1a] border border-[#1e1e30] rounded-lg px-3 py-2">
+            <svg class="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            MsgHub processa e roteia
+          </div>
+          <svg class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          <div class="flex items-center gap-1.5 bg-[#0d0d1a] border border-[#1e1e30] rounded-lg px-3 py-2">
+            <svg class="w-3.5 h-3.5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            POST para sua URL
+          </div>
+          <svg class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          <div class="flex items-center gap-1.5 bg-[#0d0d1a] border border-[#1e1e30] rounded-lg px-3 py-2">
+            <svg class="w-3.5 h-3.5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            Sua app responde
+          </div>
+        </div>
+
+        <!-- Payload example -->
+        <div class="mt-4">
+          <p class="text-xs text-gray-500 mb-2">Payload enviado para sua URL:</p>
+<pre class="bg-[#0d0d1a] border border-[#1e1e30] rounded-lg px-4 py-3 text-xs font-mono text-gray-300 overflow-x-auto">{
+  <span class="text-blue-300">"event"</span>: <span class="text-green-400">"message.received"</span>,
+  <span class="text-blue-300">"app_id"</span>: <span class="text-green-400">"<span id="wh-payload-app-id">seu-app-id</span>"</span>,
+  <span class="text-blue-300">"data"</span>: {
+    <span class="text-blue-300">"from"</span>: <span class="text-green-400">"5511999998888"</span>,
+    <span class="text-blue-300">"text"</span>: <span class="text-green-400">"Olá, preciso de ajuda!"</span>,
+    <span class="text-blue-300">"timestamp"</span>: <span class="text-green-400">"2025-01-15T14:30:00Z"</span>
+  }
+}</pre>
+        </div>
+      </div>
+
+      <div id="webhooks-list" class="space-y-3"></div>
+      <div id="webhooks-empty" class="hidden bg-[#10101e] border border-[#1e1e30] rounded-xl p-12 text-center">
+        <div class="w-12 h-12 rounded-xl bg-[#1a1a2a] flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        </div>
+        <p class="text-gray-400 text-sm font-medium mb-1">Nenhum webhook configurado</p>
+        <p class="text-gray-600 text-xs mb-4">Crie um webhook para sua app receber eventos de mensagens</p>
+        <button onclick="openNewWebhookModal()" class="text-xs text-brand-400 hover:text-brand-300 font-medium transition">+ Criar primeiro webhook</button>
+      </div>
+    </div>
+
+    <!-- ── CATÁLOGO ──────────────────────────────────────────────── -->
+    <div id="tab-services" class="hidden fade-in max-w-4xl px-8 py-8">
+      <div class="mb-7">
+        <h1 class="text-2xl font-bold mb-1">Catálogo de Serviços</h1>
+        <p class="text-sm text-gray-500">Adicione funcionalidades prontas à sua integração</p>
+      </div>
+
+      <div class="mb-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Disponível agora</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-9 h-9 rounded-xl bg-green-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+              </div>
+              <span class="badge-live">ATIVO</span>
+            </div>
+            <h3 class="font-semibold text-sm mb-1">INBOX</h3>
+            <p class="text-xs text-gray-500 mb-4">Caixa de entrada multi-agente com suporte a atendimento humano, tags, histórico e transferência de conversas.</p>
+            <button onclick="setTab('endpoints')" class="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1 transition">
+              Ver endpoints
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+          <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-9 h-9 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              </div>
+              <span class="badge-live">ATIVO</span>
+            </div>
+            <h3 class="font-semibold text-sm mb-1">AI Agent</h3>
+            <p class="text-xs text-gray-500 mb-4">Agente de IA integrado com OpenAI, Anthropic e Gemini. Responde automaticamente dentro da janela de atendimento.</p>
+            <button onclick="setTab('credentials')" class="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1 transition">
+              Configurar chave
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Em breve</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5 opacity-60">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-9 h-9 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              </div>
+              <span class="badge-soon">EM BREVE</span>
+            </div>
+            <h3 class="font-semibold text-sm mb-1">OTP via WhatsApp</h3>
+            <p class="text-xs text-gray-500">Autenticação de dois fatores e senhas de uso único enviadas via WhatsApp. Alta deliverability, sem dependência de SMS.</p>
+          </div>
+          <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5 opacity-60">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              </div>
+              <span class="badge-soon">EM BREVE</span>
+            </div>
+            <h3 class="font-semibold text-sm mb-1">Recuperação de Carrinho</h3>
+            <p class="text-xs text-gray-500">Notificações automáticas para clientes com carrinho abandonado. Integração com Shopify, WooCommerce e APIs próprias.</p>
+          </div>
+          <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5 opacity-60">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              </div>
+              <span class="badge-soon">EM BREVE</span>
+            </div>
+            <h3 class="font-semibold text-sm mb-1">Analytics</h3>
+            <p class="text-xs text-gray-500">Painel de métricas de mensagens, taxa de entrega, tempo de resposta e efetividade dos templates.</p>
+          </div>
+          <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5 opacity-60">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-9 h-9 rounded-xl bg-pink-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              </div>
+              <span class="badge-soon">EM BREVE</span>
+            </div>
+            <h3 class="font-semibold text-sm mb-1">Mídia & Documentos</h3>
+            <p class="text-xs text-gray-500">Envio e recebimento de imagens, áudios, vídeos e PDFs com armazenamento gerenciado e URLs temporárias.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div><!-- end dashboard -->
+</div><!-- end app -->
+
+<!-- ════════ MODAL: NOVA API KEY ════════ -->
+<div id="modal-key" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+  <div class="bg-[#12121e] border border-[#1e1e30] rounded-2xl p-6 w-full max-w-md fade-in">
+    <h2 class="text-base font-semibold mb-0.5">Nova API Key</h2>
+    <p class="text-xs text-gray-500 mb-5">A chave será exibida uma única vez — guarde em lugar seguro.</p>
+    <div class="space-y-4 mb-5">
+      <div>
+        <label class="text-xs text-gray-400 font-medium block mb-1.5">Nome da chave</label>
+        <input id="new-key-name" type="text" placeholder="ex: Produção, Bot de Atendimento"
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition"/>
+      </div>
+      <div>
+        <label class="text-xs text-gray-400 font-medium block mb-1.5">Permissão</label>
+        <select id="new-key-role"
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition text-gray-200">
+          <option value="member">Leitura — mensagens e contatos</option>
+          <option value="admin">Padrão — envio + webhooks</option>
+          <option value="owner">Total — acesso completo</option>
+        </select>
+      </div>
+    </div>
+    <div id="created-key-box" class="hidden bg-green-900/10 border border-green-900/30 rounded-xl p-4 mb-5">
+      <p class="text-xs text-green-400 font-semibold mb-2 flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        Chave criada! Copie agora — não será exibida novamente.
+      </p>
+      <div class="flex gap-2">
+        <code class="flex-1 bg-[#0a0a15] border border-[#1e1e30] rounded-lg px-3 py-2.5 text-xs font-mono text-green-300 break-all" id="created-key-value"></code>
+        <button onclick="copy('created-key-value')" class="copy-btn text-gray-500 hover:text-gray-300 p-2 rounded-lg hover:bg-white/5 shrink-0 transition">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="key-modal-error" class="hidden text-red-400 text-xs mb-4 bg-red-900/20 border border-red-900/30 rounded-lg px-3 py-2"></div>
     <div class="flex gap-3 justify-end">
-      <button onclick="closeKeyModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition">Fechar</button>
+      <button onclick="closeKeyModal()" class="px-4 py-2 text-sm text-gray-500 hover:text-gray-300 transition">Fechar</button>
       <button id="btn-create-key" onclick="createApiKey()"
-        class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2 rounded-lg transition">
-        Gerar Chave
-      </button>
+        class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition">Gerar Chave</button>
     </div>
   </div>
 </div>
 
-<!-- ── MODAL: NOVO WEBHOOK ────────────────────────────────────────────── -->
-<div id="modal-webhook" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-  <div class="bg-[#141414] border border-[#2a2a2a] rounded-2xl p-6 w-full max-w-md fade-in">
-    <h2 class="text-base font-semibold mb-1">Novo Webhook</h2>
-    <p class="text-xs text-gray-500 mb-5">Configure uma URL para receber eventos da plataforma.</p>
-
-    <div class="space-y-4 mb-6">
+<!-- ════════ MODAL: NOVO WEBHOOK ════════ -->
+<div id="modal-webhook" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+  <div class="bg-[#12121e] border border-[#1e1e30] rounded-2xl p-6 w-full max-w-md fade-in">
+    <h2 class="text-base font-semibold mb-0.5">Novo Webhook</h2>
+    <p class="text-xs text-gray-500 mb-5">Configure uma URL para receber eventos da sua conta.</p>
+    <div class="space-y-4 mb-5">
       <div>
-        <label class="text-xs text-gray-400 font-medium block mb-1">URL de destino</label>
-        <input id="new-wh-url" type="url" placeholder="https://minha-api.com/webhook"
-          class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition" />
+        <label class="text-xs text-gray-400 font-medium block mb-1.5">URL de destino</label>
+        <input id="new-wh-url" type="url" placeholder="https://minha-api.com/webhooks/msghub"
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition"/>
       </div>
       <div>
-        <label class="text-xs text-gray-400 font-medium block mb-1">Tabela de eventos</label>
+        <label class="text-xs text-gray-400 font-medium block mb-1.5">Evento</label>
         <select id="new-wh-table"
-          class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition text-gray-200">
-          <option value="messages">messages — novas mensagens</option>
-          <option value="conversations">conversations — atualizações de conversas</option>
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition text-gray-200">
+          <option value="messages">Mensagens recebidas / enviadas</option>
+          <option value="conversations">Atualizações de conversa</option>
         </select>
       </div>
       <div>
-        <label class="text-xs text-gray-400 font-medium block mb-2">Operações</label>
+        <label class="text-xs text-gray-400 font-medium block mb-2">Disparar em</label>
         <div class="flex gap-4">
-          <label class="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" id="op-insert" checked class="accent-brand-500 w-4 h-4" />
-            insert
+          <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input type="checkbox" id="op-insert" checked class="accent-brand-500 w-4 h-4"/>Nova mensagem
           </label>
-          <label class="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" id="op-update" class="accent-brand-500 w-4 h-4" />
-            update
+          <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input type="checkbox" id="op-update" class="accent-brand-500 w-4 h-4"/>Atualização de status
           </label>
         </div>
       </div>
       <div>
-        <label class="text-xs text-gray-400 font-medium block mb-1">Token secreto <span class="text-gray-600">(opcional)</span></label>
-        <input id="new-wh-token" type="text" placeholder="Bearer token para validar autenticidade"
-          class="w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition" />
+        <label class="text-xs text-gray-400 font-medium block mb-1.5">Token de validação <span class="text-gray-600">(opcional)</span></label>
+        <input id="new-wh-token" type="text" placeholder="Enviado no header X-MsgHub-Token"
+          class="w-full bg-[#0d0d1a] border border-[#252535] rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500 transition"/>
       </div>
     </div>
-
-    <div id="wh-modal-error" class="hidden text-red-400 text-xs mb-4 bg-red-900/20 border border-red-900/40 rounded-lg px-3 py-2"></div>
-
+    <div id="wh-modal-error" class="hidden text-red-400 text-xs mb-4 bg-red-900/20 border border-red-900/30 rounded-lg px-3 py-2"></div>
     <div class="flex gap-3 justify-end">
-      <button onclick="closeWebhookModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition">Cancelar</button>
+      <button onclick="closeWebhookModal()" class="px-4 py-2 text-sm text-gray-500 hover:text-gray-300 transition">Cancelar</button>
       <button onclick="createWebhook()"
-        class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2 rounded-lg transition">
-        Criar Webhook
-      </button>
+        class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition">Criar Webhook</button>
     </div>
   </div>
 </div>
 
-<!-- ── TOAST ─────────────────────────────────────────────────────────── -->
-<div id="toast" class="hidden fixed bottom-6 right-6 bg-[#1e1e1e] border border-[#333] text-sm px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 z-50 fade-in">
-  <svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-  <span id="toast-msg">Copiado!</span>
+<!-- ════════ TOAST ════════ -->
+<div id="toast" class="hidden fixed bottom-5 right-5 bg-[#1a1a2a] border border-[#2a2a40] text-sm px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 z-50 fade-in">
+  <svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+  <span id="toast-msg" class="text-gray-200">Copiado!</span>
 </div>
 
-<!-- ══════════════════════════════ SCRIPT ══════════════════════════════ -->
+<!-- ════════ INLINE STYLES for method badges ════════ -->
+<style>
+  .method-badge { font-size:.65rem; font-weight:700; padding:2px 7px; border-radius:4px; letter-spacing:.04em; width:42px; text-align:center; display:inline-block; }
+  .method-badge.post { background:#14290e; color:#4ade80; }
+  .method-badge.get  { background:#0e1f3d; color:#60a5fa; }
+  .method-badge.del  { background:#2e0d0d; color:#f87171; }
+  .method-badge.patch{ background:#1f1a00; color:#facc15; }
+</style>
+
+<!-- ════════ SCRIPT ════════ -->
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.54'
 
-// Proxy URL — browser talks to port 5000, Deno forwards to Supabase on 54321
-const SUPABASE_URL = '/proxy'
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
-const SERVICE_ROLE  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-
-// The supabase-js fetchHandler needs full URLs; our proxy is relative
-// We override fetch to make relative URLs absolute
-const originalFetch = window.fetch.bind(window)
-
-const supabase = createClient(window.location.origin + '/proxy', SUPABASE_ANON, {
-  auth: { persistSession: true, autoRefreshToken: true },
-  global: { headers: {} }
+const supa = createClient(window.location.origin + '/proxy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0', {
+  auth: { persistSession: true, autoRefreshToken: true, storageKey: 'msghub-session' }
 })
 
-// Service-role client for admin ops (storageKey diferente para evitar conflito)
-const admin = createClient(window.location.origin + '/proxy', SERVICE_ROLE, {
-  auth: { persistSession: false, storageKey: 'sb-admin-session' }
-})
+let _state = { org: null, keys: [], webhooks: [], user: null }
 
-// ── State ──────────────────────────────────────────────────────────────
-window._state = { org: null, keys: [], webhooks: [], user: null }
+// ─── Boot ────────────────────────────────────────────────────────────
+async function boot() {
+  const { data:{ session } } = await supa.auth.getSession()
+  if (session) await enter(session.user)
+  else         { showV('login'); showLogin() }
 
-// ── Boot ───────────────────────────────────────────────────────────────
-async function boot () {
-  const { data: { session } } = await supabase.auth.getSession()
-  if (session) {
-    await loadDashboard(session.user)
-  } else {
-    showView('login')
-    showLogin()
-  }
-
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) await loadDashboard(session.user)
-    if (event === 'SIGNED_OUT') { showView('login'); showLogin() }
+  supa.auth.onAuthStateChange(async (ev, session) => {
+    if (ev === 'SIGNED_IN'  && session) await enter(session.user)
+    if (ev === 'SIGNED_OUT')            { showV('login'); showLogin() }
   })
 }
 
-async function loadDashboard (user) {
-  window._state.user = user
-  showView('dashboard')
-
-  // user info
+async function enter(user) {
+  _state.user = user
+  showV('dashboard')
   const email = user.email ?? ''
   document.getElementById('user-email-display').textContent = email
   document.getElementById('user-avatar').textContent = email.charAt(0).toUpperCase() || '?'
 
-  // load org
-  const { data: orgs } = await supabase.from('organizations').select('*').limit(1)
-  if (!orgs || orgs.length === 0) {
-    // Create org for this user if none
-    const name = (user.user_metadata?.org_name) || email.split('@')[0] || 'Minha Organização'
-    await supabase.from('organizations').insert({ name, extra: { response_delay_seconds: 0 } })
-    const { data: newOrgs } = await supabase.from('organizations').select('*').limit(1)
-    window._state.org = newOrgs?.[0]
+  const { data: orgs } = await supa.from('organizations').select('*').limit(1)
+  if (!orgs?.length) {
+    const name = user.user_metadata?.org_name || email.split('@')[0] || 'Minha Aplicação'
+    await supa.from('organizations').insert({ name, extra:{ response_delay_seconds:0 } })
+    const { data: o2 } = await supa.from('organizations').select('*').limit(1)
+    _state.org = o2?.[0]
   } else {
-    window._state.org = orgs[0]
+    _state.org = orgs[0]
   }
 
-  const org = window._state.org
+  const org = _state.org
   if (org) {
     document.getElementById('org-name-title').textContent = org.name
     document.getElementById('org-id-display').textContent = org.id
-    document.title = `${org.name} — OpenBSP`
+    const whEl = document.getElementById('wh-payload-app-id')
+    if (whEl) whEl.textContent = org.id
+    document.title = `${org.name} — MsgHub`
   }
 
   setTab('overview')
   await Promise.all([loadKeys(), loadWebhooks(), loadAccounts()])
 }
 
-// ── Auth handlers ──────────────────────────────────────────────────────
+// ─── Auth ─────────────────────────────────────────────────────────────
 window.handleSignIn = async () => {
   const email = document.getElementById('login-email').value.trim()
-  const password = document.getElementById('login-password').value
-  const err = document.getElementById('login-error')
+  const pw    = document.getElementById('login-password').value
+  const err   = document.getElementById('login-error')
   err.classList.add('hidden')
-
-  if (!email || !password) { showErr(err, 'Preencha e-mail e senha.'); return }
-
+  if (!email || !pw) { showErr(err,'Preencha e-mail e senha.'); return }
   const btn = document.getElementById('btn-signin')
-  btn.textContent = 'Entrando...'
-  btn.disabled = true
-
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-  btn.textContent = 'Entrar'
-  btn.disabled = false
-
+  btn.textContent = 'Entrando…'; btn.disabled = true
+  const { error } = await supa.auth.signInWithPassword({ email, password: pw })
+  btn.textContent = 'Entrar'; btn.disabled = false
   if (error) showErr(err, error.message)
 }
 
 window.handleSignUp = async () => {
-  const orgName  = document.getElementById('signup-org').value.trim()
-  const email    = document.getElementById('signup-email').value.trim()
-  const password = document.getElementById('signup-password').value
-  const err      = document.getElementById('signup-error')
-  const ok       = document.getElementById('signup-success')
-  err.classList.add('hidden')
-  ok.classList.add('hidden')
-
-  if (!orgName || !email || !password) { showErr(err, 'Preencha todos os campos.'); return }
-  if (password.length < 8) { showErr(err, 'Senha deve ter no mínimo 8 caracteres.'); return }
-
-  const { error } = await supabase.auth.signUp({
-    email, password,
-    options: { data: { org_name: orgName } }
-  })
-
+  const org = document.getElementById('signup-org').value.trim()
+  const email = document.getElementById('signup-email').value.trim()
+  const pw    = document.getElementById('signup-password').value
+  const err   = document.getElementById('signup-error')
+  const ok    = document.getElementById('signup-success')
+  err.classList.add('hidden'); ok.classList.add('hidden')
+  if (!org||!email||!pw) { showErr(err,'Preencha todos os campos.'); return }
+  if (pw.length < 8)     { showErr(err,'Senha mínima de 8 caracteres.'); return }
+  const { error } = await supa.auth.signUp({ email, password: pw, options:{ data:{ org_name: org } } })
   if (error) { showErr(err, error.message); return }
-
-  ok.classList.remove('hidden')
-  ok.textContent = 'Conta criada! Fazendo login...'
-
-  // auto sign-in
-  await supabase.auth.signInWithPassword({ email, password })
+  ok.classList.remove('hidden'); ok.textContent = 'Conta criada! Entrando…'
+  await supa.auth.signInWithPassword({ email, password: pw })
 }
 
-window.handleSignOut = async () => {
-  await supabase.auth.signOut()
+window.handleSignOut = async () => await supa.auth.signOut()
+window.showLogin  = () => { $('login-form').classList.remove('hidden'); $('signup-form').classList.add('hidden') }
+window.showSignUp = () => { $('signup-form').classList.remove('hidden'); $('login-form').classList.add('hidden') }
+
+// ─── API Keys ─────────────────────────────────────────────────────────
+async function loadKeys() {
+  if (!_state.org) return
+  const { data } = await supa.from('api_keys').select('*').eq('organization_id', _state.org.id).order('created_at')
+  _state.keys = data ?? []
+  renderKeys(); updateStats()
 }
 
-window.showLogin  = () => { document.getElementById('login-form').classList.remove('hidden'); document.getElementById('signup-form').classList.add('hidden') }
-window.showSignUp = () => { document.getElementById('signup-form').classList.remove('hidden'); document.getElementById('login-form').classList.add('hidden') }
-
-// ── Keys ───────────────────────────────────────────────────────────────
-async function loadKeys () {
-  const org = window._state.org
-  if (!org) return
-  const { data } = await supabase.from('api_keys').select('*').eq('organization_id', org.id).order('created_at')
-  window._state.keys = data ?? []
-  renderKeys()
-  updateStats()
-}
-
-function renderKeys () {
-  const list = document.getElementById('keys-list')
-  const keys = window._state.keys
-
-  if (keys.length === 0) {
-    list.innerHTML = `<div class="bg-[#141414] border border-[#242424] rounded-xl p-8 text-center">
-      <p class="text-gray-500 text-sm">Nenhuma API key ainda. Crie uma para começar.</p>
-    </div>`
+function renderKeys() {
+  const el = $('keys-list')
+  if (!_state.keys.length) {
+    el.innerHTML = `<div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-10 text-center text-sm text-gray-500">Nenhuma API Key ainda. Crie uma para começar a integrar.</div>`
     return
   }
-
-  list.innerHTML = keys.map(k => `
-    <div class="bg-[#141414] border border-[#242424] rounded-xl p-4 flex items-center gap-4">
+  el.innerHTML = _state.keys.map(k => `
+    <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-4 flex items-center gap-4">
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-1">
           <span class="text-sm font-semibold">${esc(k.name)}</span>
-          <span class="text-xs px-2 py-0.5 rounded-full font-medium ${roleBadge(k.role)}">${k.role}</span>
+          <span class="text-xs px-2 py-0.5 rounded-full font-medium ${rBadge(k.role)}">${k.role}</span>
         </div>
-        <code class="text-xs font-mono text-gray-400">${k.key.substring(0, 20)}…</code>
-        <div class="text-xs text-gray-600 mt-0.5">Criada em ${fmtDate(k.created_at)}</div>
+        <code class="text-xs font-mono text-gray-500">${k.key.substring(0,24)}…</code>
+        <div class="text-xs text-gray-700 mt-0.5">Criada em ${fmtDate(k.created_at)}</div>
       </div>
-      <div class="flex gap-2">
-        <button onclick="revealKey('${k.id}','${k.key}')" title="Ver chave"
-          class="text-gray-500 hover:text-gray-300 p-2 rounded-lg hover:bg-white/5 transition">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+      <div class="flex gap-1">
+        <button onclick="revealKey('${k.id}','${k.key}')" title="Exibir chave"
+          class="copy-btn text-gray-600 hover:text-gray-300 p-2 rounded-lg hover:bg-white/5 transition">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
         </button>
         <button onclick="deleteKey('${k.id}')" title="Revogar"
-          class="text-gray-500 hover:text-red-400 p-2 rounded-lg hover:bg-red-900/10 transition">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          class="copy-btn text-gray-600 hover:text-red-400 p-2 rounded-lg hover:bg-red-900/10 transition">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
         </button>
       </div>
-    </div>
-  `).join('')
+    </div>`).join('')
 }
 
 window.openNewKeyModal = () => {
-  document.getElementById('created-key-box').classList.add('hidden')
-  document.getElementById('key-modal-error').classList.add('hidden')
-  document.getElementById('new-key-name').value = ''
-  document.getElementById('new-key-role').value = 'member'
-  document.getElementById('btn-create-key').classList.remove('hidden')
-  document.getElementById('modal-key').classList.remove('hidden')
+  $('created-key-box').classList.add('hidden')
+  $('key-modal-error').classList.add('hidden')
+  $('new-key-name').value = ''
+  $('new-key-role').value = 'admin'
+  $('btn-create-key').classList.remove('hidden')
+  $('modal-key').classList.remove('hidden')
 }
-window.closeKeyModal = () => document.getElementById('modal-key').classList.add('hidden')
+window.closeKeyModal = () => $('modal-key').classList.add('hidden')
 
 window.createApiKey = async () => {
-  const name = document.getElementById('new-key-name').value.trim()
-  const role = document.getElementById('new-key-role').value
-  const err  = document.getElementById('key-modal-error')
+  const name = $('new-key-name').value.trim()
+  const role = $('new-key-role').value
+  const err  = $('key-modal-error')
   err.classList.add('hidden')
-
-  if (!name) { showErr(err, 'Informe um nome para a chave.'); return }
-
-  const org = window._state.org
-  const key = 'sk_' + crypto.randomUUID().replace(/-/g, '') // 35-char key
-
-  const { data, error } = await supabase.from('api_keys').insert({
-    organization_id: org.id, name, role, key
-  }).select().single()
-
+  if (!name) { showErr(err,'Informe um nome para a chave.'); return }
+  const key = 'mh_' + Array.from(crypto.getRandomValues(new Uint8Array(24))).map(b=>b.toString(16).padStart(2,'0')).join('')
+  const { data, error } = await supa.from('api_keys').insert({ organization_id: _state.org.id, name, role, key }).select().single()
   if (error) { showErr(err, error.message); return }
-
-  document.getElementById('created-key-value').textContent = data.key
-  document.getElementById('created-key-box').classList.remove('hidden')
-  document.getElementById('btn-create-key').classList.add('hidden')
-
+  $('created-key-value').textContent = data.key
+  $('created-key-box').classList.remove('hidden')
+  $('btn-create-key').classList.add('hidden')
   await loadKeys()
 }
 
 window.revealKey = (id, key) => {
-  document.getElementById('new-key-name').value = ''
-  document.getElementById('btn-create-key').classList.add('hidden')
-  document.getElementById('created-key-value').textContent = key
-  document.getElementById('created-key-box').classList.remove('hidden')
-  document.getElementById('key-modal-error').classList.add('hidden')
-  document.getElementById('modal-key').classList.remove('hidden')
+  $('new-key-name').value = ''
+  $('btn-create-key').classList.add('hidden')
+  $('created-key-value').textContent = key
+  $('created-key-box').classList.remove('hidden')
+  $('key-modal-error').classList.add('hidden')
+  $('modal-key').classList.remove('hidden')
 }
 
 window.deleteKey = async (id) => {
-  if (!confirm('Revogar esta API key? Esta ação não pode ser desfeita.')) return
-  await supabase.from('api_keys').delete().eq('id', id)
+  if (!confirm('Revogar esta API Key? Aplicações usando ela irão parar de funcionar.')) return
+  await supa.from('api_keys').delete().eq('id', id)
   await loadKeys()
 }
 
-// ── Webhooks ───────────────────────────────────────────────────────────
-async function loadWebhooks () {
-  const org = window._state.org
-  if (!org) return
-  const { data } = await supabase.from('webhooks').select('*').eq('organization_id', org.id).order('created_at')
-  window._state.webhooks = data ?? []
-  renderWebhooks()
-  updateStats()
+// ─── Webhooks ─────────────────────────────────────────────────────────
+async function loadWebhooks() {
+  if (!_state.org) return
+  const { data } = await supa.from('webhooks').select('*').eq('organization_id', _state.org.id).order('created_at')
+  _state.webhooks = data ?? []
+  renderWebhooks(); updateStats()
 }
 
-function renderWebhooks () {
-  const list  = document.getElementById('webhooks-list')
-  const empty = document.getElementById('webhooks-empty')
-  const whs   = window._state.webhooks
-
-  if (whs.length === 0) {
-    list.innerHTML = ''
-    empty.classList.remove('hidden')
-    return
-  }
+function renderWebhooks() {
+  const list  = $('webhooks-list')
+  const empty = $('webhooks-empty')
+  if (!_state.webhooks.length) { list.innerHTML=''; empty.classList.remove('hidden'); return }
   empty.classList.add('hidden')
-
-  list.innerHTML = whs.map(w => `
-    <div class="bg-[#141414] border border-[#242424] rounded-xl p-4">
-      <div class="flex items-start gap-3">
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-semibold px-2 py-0.5 bg-orange-900/30 text-orange-400 rounded-full">${esc(w.table_name)}</span>
-            ${w.operations.map(op => `<span class="text-xs px-2 py-0.5 bg-blue-900/20 text-blue-400 rounded-full">${op}</span>`).join('')}
-          </div>
-          <div class="text-sm font-medium text-gray-200 truncate mb-1">${esc(w.url)}</div>
-          ${w.token ? `<div class="text-xs text-gray-600">Token configurado ✓</div>` : `<div class="text-xs text-gray-700">Sem token</div>`}
-          <div class="text-xs text-gray-600 mt-0.5">Criado em ${fmtDate(w.created_at)}</div>
+  list.innerHTML = _state.webhooks.map(w => `
+    <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-4 flex items-start gap-3">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 flex-wrap mb-1.5">
+          <span class="text-xs px-2 py-0.5 bg-blue-900/20 text-blue-400 rounded-full font-medium">${esc(w.table_name)}</span>
+          ${w.operations.map(op=>`<span class="text-xs px-2 py-0.5 bg-[#1a1a2a] text-gray-400 rounded-full">${op}</span>`).join('')}
+          ${w.token?`<span class="text-xs text-green-600">Token ✓</span>`:''}
         </div>
-        <button onclick="deleteWebhook('${w.id}')" title="Remover"
-          class="text-gray-500 hover:text-red-400 p-2 rounded-lg hover:bg-red-900/10 transition shrink-0">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-        </button>
+        <div class="text-sm font-mono text-gray-300 truncate mb-0.5">${esc(w.url)}</div>
+        <div class="text-xs text-gray-700">Criado em ${fmtDate(w.created_at)}</div>
       </div>
-    </div>
-  `).join('')
+      <button onclick="deleteWebhook('${w.id}')" title="Remover"
+        class="copy-btn text-gray-600 hover:text-red-400 p-2 rounded-lg hover:bg-red-900/10 transition shrink-0">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      </button>
+    </div>`).join('')
 }
 
 window.openNewWebhookModal = () => {
-  document.getElementById('new-wh-url').value = ''
-  document.getElementById('new-wh-table').value = 'messages'
-  document.getElementById('new-wh-token').value = ''
-  document.getElementById('op-insert').checked = true
-  document.getElementById('op-update').checked = false
-  document.getElementById('wh-modal-error').classList.add('hidden')
-  document.getElementById('modal-webhook').classList.remove('hidden')
+  $('new-wh-url').value=''; $('new-wh-table').value='messages'; $('new-wh-token').value=''
+  $('op-insert').checked=true; $('op-update').checked=false
+  $('wh-modal-error').classList.add('hidden')
+  $('modal-webhook').classList.remove('hidden')
 }
-window.closeWebhookModal = () => document.getElementById('modal-webhook').classList.add('hidden')
+window.closeWebhookModal = () => $('modal-webhook').classList.add('hidden')
 
 window.createWebhook = async () => {
-  const url   = document.getElementById('new-wh-url').value.trim()
-  const table = document.getElementById('new-wh-table').value
-  const token = document.getElementById('new-wh-token').value.trim() || null
+  const url   = $('new-wh-url').value.trim()
+  const table = $('new-wh-table').value
+  const token = $('new-wh-token').value.trim() || null
   const ops   = []
-  if (document.getElementById('op-insert').checked) ops.push('insert')
-  if (document.getElementById('op-update').checked) ops.push('update')
-  const err   = document.getElementById('wh-modal-error')
-  err.classList.add('hidden')
-
-  if (!url) { showErr(err, 'Informe a URL de destino.'); return }
-  if (ops.length === 0) { showErr(err, 'Selecione ao menos uma operação.'); return }
-
-  const org = window._state.org
-  const { error } = await supabase.from('webhooks').insert({
-    organization_id: org.id,
-    table_name: table,
-    operations: ops,
-    url,
-    token
-  })
-
+  if ($('op-insert').checked) ops.push('insert')
+  if ($('op-update').checked) ops.push('update')
+  const err = $('wh-modal-error'); err.classList.add('hidden')
+  if (!url)         { showErr(err,'Informe a URL de destino.'); return }
+  if (!ops.length)  { showErr(err,'Selecione ao menos um evento.'); return }
+  const { error } = await supa.from('webhooks').insert({ organization_id:_state.org.id, table_name:table, operations:ops, url, token })
   if (error) { showErr(err, error.message); return }
-
-  closeWebhookModal()
-  await loadWebhooks()
-  showToast('Webhook criado com sucesso!')
+  closeWebhookModal(); await loadWebhooks(); showToast('Webhook criado!')
 }
 
 window.deleteWebhook = async (id) => {
   if (!confirm('Remover este webhook?')) return
-  await supabase.from('webhooks').delete().eq('id', id)
+  await supa.from('webhooks').delete().eq('id', id)
   await loadWebhooks()
 }
 
-// ── Accounts ───────────────────────────────────────────────────────────
-async function loadAccounts () {
-  const org = window._state.org
-  if (!org) return
-  const { data } = await supabase.from('organizations_addresses')
-    .select('*').eq('organization_id', org.id)
-  document.getElementById('stat-accounts').textContent = (data ?? []).length
+// ─── Accounts ─────────────────────────────────────────────────────────
+async function loadAccounts() {
+  if (!_state.org) return
+  const { data } = await supa.from('organizations_addresses').select('id').eq('organization_id', _state.org.id)
+  $('stat-accounts').textContent = (data ?? []).length
 }
 
-// ── Stats ──────────────────────────────────────────────────────────────
-function updateStats () {
-  const keys = window._state.keys.length
-  const whs  = window._state.webhooks.length
-  document.getElementById('stat-keys').textContent = keys
-  document.getElementById('stat-webhooks').textContent = whs
-
-  // Quick start indicators
-  const qsKey = document.getElementById('qs-key')
-  const qsWh  = document.getElementById('qs-webhook')
-  if (keys > 0) { qsKey.innerHTML = '<svg class="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>'; qsKey.classList.add('border-green-500/50','bg-green-900/20') }
-  if (whs  > 0) { qsWh.innerHTML  = '<svg class="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>';  qsWh.classList.add('border-green-500/50','bg-green-900/20') }
+// ─── Stats ────────────────────────────────────────────────────────────
+function updateStats() {
+  $('stat-keys').textContent = _state.keys.length
+  $('stat-webhooks').textContent = _state.webhooks.length
+  const setDone = (id) => {
+    const el = $(id); if (!el) return
+    el.classList.add('border-green-500/40','bg-green-900/20')
+    el.innerHTML = '<svg class="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>'
+  }
+  if (_state.keys.length)     setDone('qs-key')
+  if (_state.webhooks.length) setDone('qs-webhook')
 }
 
-// ── Endpoints ──────────────────────────────────────────────────────────
-function buildEndpoints () {
-  const BASE = 'http://127.0.0.1:54321'
-  const org = window._state.org
-
-  renderEndpoint('ep-rest',       'REST API',              `${BASE}/rest/v1/`,          'GET  POST')
-  renderEndpoint('ep-graphql',    'GraphQL',               `${BASE}/graphql/v1`,         'POST')
-  renderEndpoint('ep-webhook',    'whatsapp-webhook',      `${BASE}/functions/v1/whatsapp-webhook`,  'POST')
-  renderEndpoint('ep-dispatcher', 'whatsapp-dispatcher',   `${BASE}/functions/v1/whatsapp-dispatcher`,'POST')
-  renderEndpoint('ep-management', 'whatsapp-management',   `${BASE}/functions/v1/whatsapp-management`,'POST')
-  renderEndpoint('ep-agent',      'agent-client',          `${BASE}/functions/v1/agent-client`,   'POST')
-  renderEndpoint('ep-mcp',        'MCP Server (SSE)',      `${BASE}/functions/v1/mcp`,           'GET')
-  renderEndpoint('ep-db',         'PostgreSQL',            'postgresql://postgres:postgres@127.0.0.1:54322/postgres', '')
-  renderEndpoint('ep-auth',       'Auth (GoTrue)',          `${BASE}/auth/v1/`,          'GET  POST')
-  renderEndpoint('ep-storage',    'Storage S3',            `${BASE}/storage/v1/s3`,     'PUT  GET')
-}
-
-function renderEndpoint (id, label, url, method) {
-  const el = document.getElementById(id)
-  if (!el) return
-  el.innerHTML = `
-    <div class="flex items-center gap-3 py-2.5 border-b border-[#1e1e1e] last:border-0">
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-medium text-gray-300">${esc(label)}</span>
-          ${method ? `<span class="text-xs text-gray-600">${esc(method)}</span>` : ''}
-        </div>
-        <code class="text-xs font-mono text-brand-300 break-all" id="url-${id}">${esc(url)}</code>
-      </div>
-      <button onclick="copyText('${esc(url).replace(/'/g,"\\'")}','${esc(label)}')" class="copy-btn text-gray-600 hover:text-gray-300 p-1.5 rounded-lg hover:bg-white/5 transition shrink-0">
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-      </button>
-    </div>
-  `
-}
-
-// ── Navigation ─────────────────────────────────────────────────────────
+// ─── Navigation ───────────────────────────────────────────────────────
 window.setTab = (tab) => {
   ['overview','credentials','endpoints','webhooks','services'].forEach(t => {
-    document.getElementById(`tab-${t}`).classList.add('hidden')
-    const nav = document.getElementById(`nav-${t}`)
-    if (nav) nav.classList.remove('bg-white/5','text-white','font-medium')
+    $(`tab-${t}`).classList.add('hidden')
+    $(`nav-${t}`)?.classList.remove('nav-active')
   })
-  document.getElementById(`tab-${tab}`).classList.remove('hidden')
-  const activeNav = document.getElementById(`nav-${tab}`)
-  if (activeNav) activeNav.classList.add('bg-white/5','text-white','font-medium')
-
-  if (tab === 'endpoints') buildEndpoints()
+  $(`tab-${tab}`).classList.remove('hidden')
+  $(`nav-${tab}`)?.classList.add('nav-active')
 }
 
-// ── Utils ──────────────────────────────────────────────────────────────
-function showView (v) {
-  document.getElementById('view-login').classList.add('hidden')
-  document.getElementById('view-dashboard').classList.add('hidden')
-  document.getElementById(`view-${v}`).classList.remove('hidden')
+// ─── Code tabs ────────────────────────────────────────────────────────
+window.showCodeTab = (lang) => {
+  ['js','python','curl'].forEach(l => {
+    $(`code-${l}`).classList.add('hidden')
+    $(`code-tab-${l}`).className = 'text-xs px-3 py-1 rounded-md text-gray-500 hover:text-gray-300 transition font-medium'
+  })
+  $(`code-${lang}`).classList.remove('hidden')
+  $(`code-tab-${lang}`).className = 'text-xs px-3 py-1 rounded-md bg-brand-600/30 text-brand-300 font-medium'
 }
 
-function showErr (el, msg) { el.textContent = msg; el.classList.remove('hidden') }
-
-function showToast (msg = 'Copiado!') {
-  const t = document.getElementById('toast')
-  document.getElementById('toast-msg').textContent = msg
-  t.classList.remove('hidden')
-  setTimeout(() => t.classList.add('hidden'), 2200)
+// ─── Utils ────────────────────────────────────────────────────────────
+function showV(v) {
+  $('view-login').classList.add('hidden')
+  $('view-dashboard').classList.add('hidden')
+  $(`view-${v}`).classList.remove('hidden')
 }
-
-window.copy = (id) => {
-  const text = document.getElementById(id)?.textContent ?? ''
-  navigator.clipboard.writeText(text).then(() => showToast('Copiado!'))
+function showErr(el, msg) { el.textContent = msg; el.classList.remove('hidden') }
+function showToast(msg='Copiado!') {
+  $('toast-msg').textContent = msg
+  $('toast').classList.remove('hidden')
+  setTimeout(() => $('toast').classList.add('hidden'), 2200)
 }
+window.copy = (id) => navigator.clipboard.writeText($(id)?.textContent ?? '').then(() => showToast('Copiado!'))
+window.copyText = (text) => navigator.clipboard.writeText(text).then(() => showToast('Copiado!'))
+function $(id) { return document.getElementById(id) }
+function rBadge(r) { return r==='owner'?'bg-red-900/20 text-red-400':r==='admin'?'bg-yellow-900/20 text-yellow-400':'bg-blue-900/20 text-blue-400' }
+function fmtDate(s) { return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}) }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
 
-window.copyText = (text, label) => {
-  navigator.clipboard.writeText(text).then(() => showToast(`${label} copiado!`))
-}
-
-function roleBadge (role) {
-  if (role === 'owner') return 'bg-red-900/20 text-red-400'
-  if (role === 'admin') return 'bg-yellow-900/20 text-yellow-400'
-  return 'bg-blue-900/20 text-blue-400'
-}
-
-function fmtDate (s) {
-  return new Date(s).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' })
-}
-
-function esc (s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-}
-
-// ── Init ───────────────────────────────────────────────────────────────
 boot()
 </script>
 </body>
