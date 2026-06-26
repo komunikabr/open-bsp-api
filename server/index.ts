@@ -1,31 +1,62 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
-import organizationsRouter from "./routes/organizations";
-import apiKeysRouter from "./routes/apiKeys";
-import webhooksRouter from "./routes/webhooks";
-import accountsRouter from "./routes/accounts";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error("ERROR: SUPABASE_URL and SUPABASE_ANON_KEY environment variables must be set.");
+  process.exit(1);
+}
+
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Expose Supabase config to frontend (anon key is public by design)
+app.get("/api/config", (_req, res) => {
+  res.json({ url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY });
+});
 
-// Replit Auth
-await setupAuth(app);
-registerAuthRoutes(app);
+// Proxy /proxy/* → Supabase
+app.use(
+  "/proxy",
+  createProxyMiddleware({
+    target: SUPABASE_URL,
+    changeOrigin: true,
+    pathRewrite: { "^/proxy": "" },
+    on: {
+      proxyRes: (proxyRes) => {
+        proxyRes.headers["access-control-allow-origin"] = "*";
+        proxyRes.headers["access-control-allow-headers"] =
+          "authorization, apikey, content-type, x-client-info, api-key";
+        proxyRes.headers["access-control-allow-methods"] =
+          "GET, POST, PUT, PATCH, DELETE, OPTIONS";
+      },
+    },
+  })
+);
 
-// API Routes
-app.use("/api/organizations", organizationsRouter);
-app.use("/api/api-keys", apiKeysRouter);
-app.use("/api/webhooks", webhooksRouter);
-app.use("/api/accounts", accountsRouter);
+// Handle CORS preflight for proxy
+app.options("/proxy/*", (_req, res) => {
+  res.set({
+    "access-control-allow-origin": "*",
+    "access-control-allow-headers":
+      "authorization, apikey, content-type, x-client-info, api-key",
+    "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+  });
+  res.sendStatus(204);
+});
 
-// Serve static frontend
+// Inject Supabase config into index.html
 const publicDir = path.join(__dirname, "..", "public");
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(publicDir, "index.html"));
+});
+
+// Serve static files
 app.use(express.static(publicDir));
 
 // SPA fallback
@@ -35,5 +66,6 @@ app.get("/{*splat}", (_req, res) => {
 
 const PORT = parseInt(process.env.PORT || "5000");
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Portal rodando em http://0.0.0.0:${PORT}`);
+  console.log(`Proxying Supabase: ${SUPABASE_URL}`);
 });
