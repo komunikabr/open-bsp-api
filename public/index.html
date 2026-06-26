@@ -213,18 +213,30 @@
           <svg class="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Início Rápido
         </h2>
-        <div class="space-y-4">
-          <div class="flex items-start gap-3">
-            <div id="qs-key" class="w-5 h-5 rounded-full border-2 border-[#2e2e45] flex items-center justify-center shrink-0 mt-0.5"><div class="w-2 h-2 rounded-full bg-[#2e2e45]"></div></div>
-            <div><button onclick="setTab('credentials')" class="text-sm font-medium hover:text-brand-300 transition text-left">Gere uma API Key</button><div class="text-xs text-gray-500">Autentique todas as chamadas à nossa API com sua chave secreta</div></div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 bg-[#0d0d1a] border border-[#1e1e30] rounded-xl px-4 py-3">
+            <div id="qs-key" class="w-5 h-5 rounded-full border-2 border-[#2e2e45] flex items-center justify-center shrink-0"><div class="w-2 h-2 rounded-full bg-[#2e2e45]"></div></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium">Gere uma API Key</div>
+              <div class="text-xs text-gray-500">Autentique todas as chamadas à nossa API com sua chave secreta</div>
+            </div>
+            <button onclick="openNewKeyModal()" class="shrink-0 text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 rounded-lg transition whitespace-nowrap">Criar Key</button>
           </div>
-          <div class="flex items-start gap-3">
-            <div id="qs-webhook" class="w-5 h-5 rounded-full border-2 border-[#2e2e45] flex items-center justify-center shrink-0 mt-0.5"><div class="w-2 h-2 rounded-full bg-[#2e2e45]"></div></div>
-            <div><button onclick="setTab('webhooks')" class="text-sm font-medium hover:text-brand-300 transition text-left">Configure seu Webhook</button><div class="text-xs text-gray-500">Receba eventos de mensagens e conversas na URL da sua aplicação</div></div>
+          <div class="flex items-center gap-3 bg-[#0d0d1a] border border-[#1e1e30] rounded-xl px-4 py-3">
+            <div id="qs-webhook" class="w-5 h-5 rounded-full border-2 border-[#2e2e45] flex items-center justify-center shrink-0"><div class="w-2 h-2 rounded-full bg-[#2e2e45]"></div></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium">Configure seu Webhook</div>
+              <div class="text-xs text-gray-500">Receba eventos de mensagens e conversas na URL da sua aplicação</div>
+            </div>
+            <button onclick="setTab('webhooks')" class="shrink-0 text-xs font-semibold border border-[#2e2e45] hover:border-brand-500 hover:text-brand-300 text-gray-300 px-3 py-1.5 rounded-lg transition whitespace-nowrap">Configurar</button>
           </div>
-          <div class="flex items-start gap-3">
-            <div class="w-5 h-5 rounded-full border-2 border-[#2e2e45] flex items-center justify-center shrink-0 mt-0.5"><div class="w-2 h-2 rounded-full bg-[#2e2e45]"></div></div>
-            <div><button onclick="setTab('endpoints')" class="text-sm font-medium hover:text-brand-300 transition text-left">Explore os Endpoints</button><div class="text-xs text-gray-500">Envie mensagens, consulte contatos e conversas via nossa REST API</div></div>
+          <div class="flex items-center gap-3 bg-[#0d0d1a] border border-[#1e1e30] rounded-xl px-4 py-3">
+            <div class="w-5 h-5 rounded-full border-2 border-[#2e2e45] flex items-center justify-center shrink-0"><div class="w-2 h-2 rounded-full bg-[#2e2e45]"></div></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium">Explore os Endpoints</div>
+              <div class="text-xs text-gray-500">Envie mensagens, consulte contatos e conversas via nossa REST API</div>
+            </div>
+            <button onclick="setTab('endpoints')" class="shrink-0 text-xs font-semibold border border-[#2e2e45] hover:border-brand-500 hover:text-brand-300 text-gray-300 px-3 py-1.5 rounded-lg transition whitespace-nowrap">Ver Endpoints</button>
           </div>
         </div>
       </div>
