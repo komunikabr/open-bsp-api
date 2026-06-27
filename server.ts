@@ -34,7 +34,7 @@ async function proxySupabase(req: Request, path: string): Promise<Response> {
   // Deno's fetch auto-decompresses responses, so tell upstream not to compress.
   // This prevents ERR_CONTENT_DECODING_FAILED when the browser receives an
   // already-decompressed body that still carries Content-Encoding: gzip.
-  headers.delete("accept-encoding");
+  headers.set("accept-encoding", "identity");
 
   try {
     const body = req.method !== "GET" && req.method !== "HEAD"

@@ -1,0 +1,48 @@
+(index):64 cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+(anonymous) @ (index):64
+(anonymous) @ (index):64
+app:881  POST http://98.93.218.21:5000/proxy/auth/v1/token?grant_type=password net::ERR_CONTENT_DECODING_FAILED 200 (OK)
+(anonymous) @ helpers.ts:105
+_handleRequest @ fetch.ts:184
+_request @ fetch.ts:157
+signInWithPassword @ GoTrueClient.ts:573
+window.handleSignIn @ app:881
+onclick @ app:102
+supabase-js.mjs:3  POST http://98.93.218.21:5000/proxy/rest/v1/organizations?select=* 403 (Forbidden)
+(anonymous) @ supabase-js.mjs:3
+(anonymous) @ supabase-js.mjs:3
+h @ supabase-js.mjs:3
+Promise.then
+c @ supabase-js.mjs:3
+(anonymous) @ supabase-js.mjs:3
+y @ supabase-js.mjs:3
+(anonymous) @ supabase-js.mjs:3
+then @ PostgrestBuilder.ts:101
+app:846 Org create error: {code: '42501', details: null, hint: null, message: 'new row violates row-level security policy for table "organizations"'}
+enter @ app:846
+await in enter
+(anonymous) @ app:819
+(anonymous) @ GoTrueClient.ts:2370
+_notifyAllSubscribers @ GoTrueClient.ts:2368
+signInWithPassword @ GoTrueClient.ts:607
+await in signInWithPassword
+window.handleSignIn @ app:881
+onclick @ app:102
+app:856 Org setup error: TypeError: Cannot set property className of #<SVGElement> which has only a getter
+    at showToast (app:1169:36)
+    at enter (app:847:9)
+    at async Object.callback (app:819:40)
+    at async GoTrueClient.ts:2370:11
+    at async Promise.all (index 1)
+    at async m._notifyAllSubscribers (GoTrueClient.ts:2376:7)
+    at async m.signInWithPassword (GoTrueClient.ts:607:9)
+    at async window.handleSignIn (app:881:21)
+enter @ app:856
+await in enter
+(anonymous) @ app:819
+(anonymous) @ GoTrueClient.ts:2370
+_notifyAllSubscribers @ GoTrueClient.ts:2368
+signInWithPassword @ GoTrueClient.ts:607
+await in signInWithPassword
+window.handleSignIn @ app:881
+onclick @ app:102
