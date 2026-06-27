@@ -162,6 +162,10 @@
         <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
         Webhooks
       </button>
+      <button onclick="setTab('billing')" id="nav-billing" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        Plano & Uso
+      </button>
       <div class="border-t border-[#1a1a2a] pt-3 mt-2">
         <p class="px-3 text-xs text-gray-600 font-semibold mb-1.5 uppercase tracking-wider">Serviços</p>
         <button onclick="setTab('services')" id="nav-services" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
@@ -510,6 +514,68 @@ print(res.json())</pre>
             <h3 class="font-semibold text-sm mb-1">Mídia & Documentos</h3>
             <p class="text-xs text-gray-500">Envio e recebimento de imagens, áudios, vídeos e PDFs com armazenamento gerenciado.</p>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BILLING ──────────────────────────────────────────────────── -->
+    <div id="tab-billing" class="hidden fade-in max-w-4xl px-8 py-8">
+      <div class="mb-7">
+        <h1 class="text-2xl font-bold mb-1">Plano & Uso</h1>
+        <p class="text-sm text-gray-500">Acompanhe seu consumo e gerencie sua assinatura</p>
+      </div>
+
+      <!-- Plano atual -->
+      <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl p-5 mb-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold">Plano Atual</h2>
+          <span id="billing-plan-badge" class="text-xs px-2.5 py-0.5 rounded-full bg-brand-900/40 text-brand-300 font-medium">—</span>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <div class="text-xs text-gray-500 mb-1">Plano</div>
+            <div class="text-sm font-semibold" id="billing-plan-name">—</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500 mb-1">Valor</div>
+            <div class="text-sm font-semibold" id="billing-plan-price">—</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500 mb-1">Próxima renovação</div>
+            <div class="text-sm font-semibold" id="billing-period-end">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Uso por produto -->
+      <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl overflow-hidden mb-5">
+        <div class="px-5 py-3.5 border-b border-[#1a1a2a] flex items-center justify-between">
+          <h2 class="text-sm font-semibold">Uso do Mês Atual</h2>
+          <span class="text-xs text-gray-600" id="billing-period-label">—</span>
+        </div>
+        <div id="billing-usage-list" class="divide-y divide-[#14142a] px-5">
+          <div class="py-4 text-xs text-gray-600">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- Trocar plano -->
+      <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl overflow-hidden mb-5">
+        <div class="px-5 py-3.5 border-b border-[#1a1a2a]">
+          <h2 class="text-sm font-semibold">Planos Disponíveis</h2>
+        </div>
+        <div id="billing-plans-list" class="p-5 grid grid-cols-2 gap-4">
+          <div class="text-xs text-gray-600">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- Ledger AI -->
+      <div class="bg-[#10101e] border border-[#1e1e30] rounded-xl overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-[#1a1a2a] flex items-center justify-between">
+          <h2 class="text-sm font-semibold">Histórico de Créditos IA</h2>
+          <span class="text-xs text-gray-600">Últimos 50 eventos</span>
+        </div>
+        <div id="billing-ledger-list" class="divide-y divide-[#14142a] px-5">
+          <div class="py-4 text-xs text-gray-600">Carregando...</div>
         </div>
       </div>
     </div>
@@ -1072,12 +1138,13 @@ function updateStats() {
 
 // ─── Navigation ────────────────────────────────────────────────────────
 window.setTab = (tab) => {
-  ['overview','credentials','endpoints','webhooks','services'].forEach(t => {
+  ['overview','credentials','endpoints','webhooks','billing','services'].forEach(t => {
     $(`tab-${t}`).classList.add('hidden')
     $(`nav-${t}`)?.classList.remove('nav-active')
   })
   $(`tab-${tab}`).classList.remove('hidden')
   $(`nav-${tab}`)?.classList.add('nav-active')
+  if (tab === 'billing') loadBilling()
 }
 
 window.showCodeTab = (lang) => {
@@ -1110,6 +1177,207 @@ function rBadge(r) { return r==='owner'?'rb-owner':r==='admin'?'rb-admin':'rb-me
 function roleName(r) { return r==='owner'?'Completo':r==='admin'?'Padrão':'Leitura' }
 function fmtDate(s) { return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}) }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') }
+
+// ─── Billing ────────────────────────────────────────────────────────────
+let _billingLoaded = false
+
+async function loadBilling() {
+  if (_billingLoaded) return
+  const org = _state.org
+  if (!org) return
+
+  const supaUrl = cfg.url
+  const headers = { 'Content-Type': 'application/json' }
+
+  // Get current session token for JWT auth
+  const { data: { session } } = await supa.auth.getSession()
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`
+    headers['x-organization-id'] = org.id
+  } else {
+    // Fallback: use API key if available
+    const key = _state.keys[0]?.key
+    if (key) headers['Authorization'] = `Bearer ${key}`
+  }
+
+  const fnBase = `${supaUrl}/functions/v1`
+
+  try {
+    const [subRes, usageRes, plansRes, ledgerRes] = await Promise.all([
+      fetch(`${fnBase}/billing/subscription`, { headers }),
+      fetch(`${fnBase}/billing/usage?interval=month`, { headers }),
+      fetch(`${fnBase}/billing/plans`, { headers }),
+      fetch(`${fnBase}/billing/ledger?limit=50`, { headers }),
+    ])
+
+    const sub = subRes.ok ? await subRes.json() : null
+    const usageData = usageRes.ok ? await usageRes.json() : null
+    const plansData = plansRes.ok ? await plansRes.json() : null
+    const ledger = ledgerRes.ok ? await ledgerRes.json() : []
+
+    renderBillingSubscription(sub)
+    renderBillingUsage(usageData)
+    renderBillingPlans(plansData, sub, headers, fnBase, org.id)
+    renderBillingLedger(ledger)
+    _billingLoaded = true
+  } catch(e) {
+    console.error('billing load error', e)
+  }
+}
+
+function renderBillingSubscription(sub) {
+  if (!sub) {
+    $('billing-plan-name').textContent = '—'
+    $('billing-plan-price').textContent = '—'
+    $('billing-plan-badge').textContent = 'Sem plano'
+    $('billing-period-end').textContent = '—'
+    return
+  }
+  const planName = sub.plan?.id ?? sub.tier?.name ?? '—'
+  const planNameCap = planName.charAt(0).toUpperCase() + planName.slice(1)
+  $('billing-plan-name').textContent = planNameCap
+  $('billing-plan-badge').textContent = (sub.tier?.name ?? '—').toUpperCase()
+  const price = sub.plan?.price
+  $('billing-plan-price').textContent = price == null ? 'Gratuito'
+    : price === 0 ? 'Gratuito'
+    : `US$ ${Number(price).toFixed(2)}/${sub.plan?.billing_cycle === 'year' ? 'ano' : 'mês'}`
+  $('billing-period-end').textContent = sub.current_period_end
+    ? fmtDate(sub.current_period_end) : 'Sem vencimento'
+}
+
+function renderBillingUsage(data) {
+  const el = $('billing-usage-list')
+  if (!data || !data.usage?.length) {
+    el.innerHTML = '<div class="py-4 text-xs text-gray-600">Nenhum dado de uso disponível.</div>'
+    return
+  }
+
+  const now = new Date()
+  const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`
+  $('billing-period-label').textContent = new Date(monthKey).toLocaleDateString('pt-BR',{month:'long',year:'numeric'})
+
+  // Group by product, pick current month
+  const byProduct = {}
+  for (const row of data.usage) {
+    if (!byProduct[row.product_id] || row.period > byProduct[row.product_id].period) {
+      byProduct[row.product_id] = row
+    }
+  }
+
+  const unitLabel = { count: '', gb: ' GB', usd: ' USD' }
+  const icons = {
+    messages: '<svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>',
+    conversations: '<svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-1"/><path stroke-linecap="round" stroke-linejoin="round" d="M11 2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l4-4h2a2 2 0 002-2V4a2 2 0 00-2-2z"/></svg>',
+    storage: '<svg class="w-4 h-4 text-yellow-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>',
+    ai_credits: '<svg class="w-4 h-4 text-purple-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>',
+  }
+  const productNames = { messages: 'Mensagens', conversations: 'Conversas', storage: 'Armazenamento', ai_credits: 'Créditos IA' }
+
+  let html = ''
+  for (const [pid, row] of Object.entries(byProduct)) {
+    const qty = Number(row.quantity)
+    const limit = data.limits[pid]
+    const inc = data.included[pid]
+    const cap = limit?.cap ?? null
+    const included = inc?.quantity ?? null
+    const unit = unitLabel[pid] ?? ''
+    const pct = cap ? Math.min(100, Math.round(Math.abs(qty) / Math.abs(cap) * 100)) : null
+    const qtyFmt = Math.abs(qty) >= 1000 ? `${(Math.abs(qty)/1000).toFixed(1)}k` : Math.abs(qty).toFixed(pid === 'ai_credits' || pid === 'storage' ? 2 : 0)
+
+    const barColor = pct != null
+      ? pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-yellow-500' : 'bg-brand-500'
+      : 'bg-brand-500'
+
+    html += `<div class="py-4">
+      <div class="flex items-center gap-3 mb-2">
+        ${icons[pid] ?? ''}
+        <span class="text-sm font-medium flex-1">${productNames[pid] ?? pid}</span>
+        <span class="text-sm font-mono text-gray-300">${qtyFmt}${unit}${cap != null ? ` / ${cap}${unit}` : ''}</span>
+      </div>
+      ${pct != null ? `<div class="h-1.5 bg-[#1a1a2a] rounded-full overflow-hidden"><div class="${barColor} h-full rounded-full transition-all" style="width:${pct}%"></div></div>` : ''}
+      ${included != null ? `<div class="text-xs text-gray-600 mt-1">Incluso no plano: ${included}${unit}${inc?.unit_price ? ` · Overage: US$ ${inc.unit_price}${unit}` : ''}</div>` : ''}
+    </div>`
+  }
+  el.innerHTML = html
+}
+
+function renderBillingPlans(data, sub, headers, fnBase, orgId) {
+  const el = $('billing-plans-list')
+  if (!data?.plans?.length) {
+    el.innerHTML = '<div class="text-xs text-gray-600">Nenhum plano disponível.</div>'
+    return
+  }
+  const currentPlanId = sub?.plan?.id
+  let html = ''
+  for (const plan of data.plans) {
+    const isCurrent = plan.id === currentPlanId
+    const name = plan.id.charAt(0).toUpperCase() + plan.id.slice(1)
+    const price = plan.price === 0 ? 'Gratuito' : `US$ ${Number(plan.price).toFixed(2)}/${plan.billing_cycle === 'year' ? 'ano' : 'mês'}`
+    const prods = plan.plans_products ?? []
+    const items = prods.map(pp => {
+      const prod = data.products?.find(p => p.id === pp.product_id)
+      const unit = { count: '', gb: ' GB', usd: ' USD' }[prod?.unit] ?? ''
+      return `<li class="text-xs text-gray-500">${prod?.name ?? pp.product_id}: ${pp.included != null ? pp.included + unit : '—'}${pp.unit_price ? ` · $${pp.unit_price}${unit} overage` : ''}</li>`
+    }).join('')
+
+    html += `<div class="bg-[#0d0d1a] border ${isCurrent ? 'border-brand-600' : 'border-[#1e1e30]'} rounded-xl p-4 flex flex-col gap-3">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="font-semibold text-sm">${name}</div>
+          <div class="text-xs text-gray-500 mt-0.5">${price}</div>
+        </div>
+        ${isCurrent ? '<span class="text-xs px-2 py-0.5 bg-brand-900/40 text-brand-300 rounded-full font-medium">Atual</span>' : ''}
+      </div>
+      ${items ? `<ul class="space-y-0.5">${items}</ul>` : ''}
+      ${!isCurrent ? `<button onclick="changePlan('${plan.id}')" class="mt-auto text-xs py-1.5 px-3 rounded-lg bg-brand-600/20 text-brand-300 hover:bg-brand-600/40 transition font-medium">Selecionar plano</button>` : '<div class="mt-auto text-xs text-gray-600">Plano ativo</div>'}
+    </div>`
+  }
+  el.innerHTML = html
+
+  window.changePlan = async (planId) => {
+    if (!confirm(`Confirma troca para o plano "${planId}"?`)) return
+    try {
+      const res = await fetch(`${fnBase}/billing/change-plan`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ plan_id: planId, organization_id: orgId })
+      })
+      if (!res.ok) throw new Error((await res.json()).message ?? 'Erro')
+      showToast('Plano atualizado!')
+      _billingLoaded = false
+      loadBilling()
+    } catch(e) {
+      showToast(e.message, true)
+    }
+  }
+}
+
+function renderBillingLedger(entries) {
+  const el = $('billing-ledger-list')
+  if (!entries?.length) {
+    el.innerHTML = '<div class="py-4 text-xs text-gray-600">Nenhum evento de crédito registrado.</div>'
+    return
+  }
+  const typeLabel = { grant: 'Concessão', consumption: 'Consumo', topup: 'Recarga' }
+  const typeColor = { grant: 'text-green-400', consumption: 'text-red-400', topup: 'text-blue-400' }
+  let html = ''
+  for (const e of entries) {
+    const qty = Number(e.quantity)
+    const sign = qty >= 0 ? '+' : ''
+    const meta = e.metadata ? `${e.provider ?? ''} ${e.model ?? ''}`.trim() : ''
+    html += `<div class="py-3 flex items-center gap-3">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-medium ${typeColor[e.type] ?? 'text-gray-400'}">${typeLabel[e.type] ?? e.type}</span>
+          ${meta ? `<span class="text-xs text-gray-600">${esc(meta)}</span>` : ''}
+        </div>
+        <div class="text-xs text-gray-600 mt-0.5">${fmtDate(e.created_at)}</div>
+      </div>
+      <div class="text-sm font-mono font-semibold ${qty >= 0 ? 'text-green-400' : 'text-red-400'}">${sign}${qty.toFixed(3)} USD</div>
+    </div>`
+  }
+  el.innerHTML = html
+}
 
 boot()
 </script>
