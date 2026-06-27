@@ -436,12 +436,31 @@ async function doLogin() {
 
 async function initApp(session) {
   _token = session.access_token
-  // Verify admin access
-  const ok = await api('GET', 'stats').catch(() => null)
-  if (ok === null) {
+
+  // Verify admin access via Edge Function
+  let ok = null, errMsg = ''
+  try {
+    const res = await fetch(`${cfg.url}/functions/v1/billing-admin/stats`, {
+      headers: { 'Authorization': `Bearer ${_token}`, 'Content-Type': 'application/json' }
+    })
+    if (res.ok) {
+      ok = await res.json()
+    } else if (res.status === 403) {
+      errMsg = 'Acesso negado: seu usuário não está na lista de administradores.'
+    } else if (res.status === 404) {
+      errMsg = 'Edge Function "billing-admin" não encontrada. Execute: supabase functions deploy billing-admin'
+    } else {
+      const body = await res.json().catch(() => ({}))
+      errMsg = `Erro ${res.status}: ${body.message ?? res.statusText}`
+    }
+  } catch(e) {
+    errMsg = `Erro de conexão: ${e.message}`
+  }
+
+  if (!ok) {
     await supa.auth.signOut()
     showLogin()
-    document.getElementById('login-err').textContent = 'Acesso negado: não é administrador.'
+    document.getElementById('login-err').textContent = errMsg || 'Erro desconhecido.'
     document.getElementById('login-err').classList.remove('hidden')
     return
   }
