@@ -740,6 +740,26 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.54'
 
 const cfg = await fetch('/api/config').then(r => r.json())
 
+if (!cfg.anonKey) {
+  document.body.innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#080810;font-family:system-ui,sans-serif;">
+      <div style="max-width:480px;padding:2rem;background:#10101e;border:1px solid #1e1e30;border-radius:1rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:1rem;">⚙️</div>
+        <h2 style="color:#e5e7eb;font-size:1.2rem;font-weight:600;margin-bottom:.75rem;">Configuração necessária</h2>
+        <p style="color:#6b7280;font-size:.875rem;line-height:1.6;margin-bottom:1.5rem;">
+          As variáveis <code style="background:#1a1a2a;padding:2px 6px;border-radius:4px;color:#7fb3fc">SUPABASE_URL</code> e
+          <code style="background:#1a1a2a;padding:2px 6px;border-radius:4px;color:#7fb3fc">SUPABASE_ANON_KEY</code>
+          não estão configuradas.<br><br>
+          Adicione-as em <strong style="color:#e5e7eb">Ferramentas → Secrets</strong> no Replit e reinicie o servidor.
+        </p>
+        <button onclick="location.reload()" style="background:#2260ed;color:#fff;border:none;padding:.6rem 1.5rem;border-radius:.5rem;cursor:pointer;font-size:.875rem;font-weight:500;">
+          Tentar novamente
+        </button>
+      </div>
+    </div>`
+  throw new Error('SUPABASE_ANON_KEY não configurado. Adicione os Secrets no Replit.')
+}
+
 const supa = createClient(window.location.origin + '/proxy', cfg.anonKey, {
   auth: { persistSession: true, autoRefreshToken: true, storageKey: 'msghub-session' }
 })
