@@ -85,6 +85,7 @@ Browser → /               → server.ts → public/index.html
 |---|---|---|
 | `SUPABASE_URL` | URL do projeto Supabase hospedado (ex: `https://xyzxyz.supabase.co` ou IP do VPS) | ✅ |
 | `SUPABASE_ANON_KEY` | Chave anon/public do Supabase | ✅ |
+| `API_BASE_URL` | Base URL pública da API exibida no portal (ex: `https://api.msghub.com.br/v1`). Se não definida, usa o origin atual como fallback. | ❌ |
 
 Configurar em: **Ferramentas → Secrets** no Replit.
 

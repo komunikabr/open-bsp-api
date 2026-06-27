@@ -3,6 +3,7 @@ import { join } from "https://deno.land/std@0.224.0/path/mod.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "http://127.0.0.1:54321";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+const API_BASE_URL = Deno.env.get("API_BASE_URL") ?? "";
 const PUBLIC_DIR = "./public";
 
 async function serveFile(path: string): Promise<Response> {
@@ -85,7 +86,7 @@ serve(async (req: Request) => {
   // Expõe config do Supabase para o frontend
   if (pathname === "/api/config") {
     return new Response(
-      JSON.stringify({ url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY }),
+      JSON.stringify({ url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY, apiBaseUrl: API_BASE_URL }),
       { headers: { "content-type": "application/json" } },
     );
   }
