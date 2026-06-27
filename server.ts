@@ -47,9 +47,13 @@ async function proxySupabase(req: Request, path: string): Promise<Response> {
       body,
     });
 
+    // Buffer the full body — this forces Deno to decompress gzip/br content
+    // before we forward it, preventing ERR_CONTENT_DECODING_FAILED in browsers.
+    const resBody = await upstream.arrayBuffer();
+
     const resHeaders = new Headers(upstream.headers);
-    // Remove encoding header — body is already decompressed by Deno fetch.
     resHeaders.delete("content-encoding");
+    resHeaders.delete("transfer-encoding");
     resHeaders.set("access-control-allow-origin", "*");
     resHeaders.set(
       "access-control-allow-headers",
@@ -60,7 +64,7 @@ async function proxySupabase(req: Request, path: string): Promise<Response> {
       "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     );
 
-    return new Response(upstream.body, {
+    return new Response(resBody, {
       status: upstream.status,
       headers: resHeaders,
     });
