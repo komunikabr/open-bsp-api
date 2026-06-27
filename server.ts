@@ -31,6 +31,10 @@ async function proxySupabase(req: Request, path: string): Promise<Response> {
   const target = `${SUPABASE_URL}${path}`;
   const headers = new Headers(req.headers);
   headers.delete("host");
+  // Deno's fetch auto-decompresses responses, so tell upstream not to compress.
+  // This prevents ERR_CONTENT_DECODING_FAILED when the browser receives an
+  // already-decompressed body that still carries Content-Encoding: gzip.
+  headers.delete("accept-encoding");
 
   try {
     const body = req.method !== "GET" && req.method !== "HEAD"
@@ -44,6 +48,8 @@ async function proxySupabase(req: Request, path: string): Promise<Response> {
     });
 
     const resHeaders = new Headers(upstream.headers);
+    // Remove encoding header — body is already decompressed by Deno fetch.
+    resHeaders.delete("content-encoding");
     resHeaders.set("access-control-allow-origin", "*");
     resHeaders.set(
       "access-control-allow-headers",
