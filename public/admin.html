@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OpenBSP Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: { extend: { colors: {
+    brand: { 300:'#7dd3fc', 400:'#38bdf8', 500:'#0ea5e9', 600:'#0284c7', 700:'#0369a1', 900:'#0c4a6e' }
+  }}}
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  body { background:#080812; color:#e2e8f0; font-family:'Inter',system-ui,sans-serif; }
+  .nav-active { background:rgba(255,255,255,.07); color:#e2e8f0; }
+  .fade-in { animation:fadeIn .18s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+  .badge { display:inline-flex;align-items:center;padding:1px 8px;border-radius:9999px;font-size:11px;font-weight:600; }
+  .badge-free  { background:#1e293b;color:#94a3b8; }
+  .badge-paid  { background:#0c4a6e;color:#7dd3fc; }
+  .badge-draft { background:#292524;color:#a8a29e; }
+  .badge-issued{ background:#1e3a5f;color:#93c5fd; }
+  .badge-paid-inv { background:#14532d;color:#86efac; }
+  input,select,textarea { background:#10101e!important;border:1px solid #1e1e30!important;border-radius:.5rem!important;color:#e2e8f0!important;padding:.5rem .75rem!important;font-size:.875rem!important;width:100%; }
+  input:focus,select:focus { outline:none!important;border-color:#0ea5e9!important; }
+  .btn { padding:.5rem 1.25rem;border-radius:.5rem;font-size:.875rem;font-weight:500;cursor:pointer;transition:all .15s; }
+  .btn-primary { background:#0284c7;color:#fff; } .btn-primary:hover { background:#0369a1; }
+  .btn-ghost { background:transparent;color:#94a3b8;border:1px solid #1e1e30; } .btn-ghost:hover { color:#e2e8f0;border-color:#374151; }
+  .btn-danger { background:#7f1d1d;color:#fca5a5; } .btn-danger:hover { background:#991b1b; }
+  .btn-sm { padding:.3rem .75rem;font-size:.75rem; }
+  .card { background:#10101e;border:1px solid #1e1e30;border-radius:.75rem; }
+  .th { padding:.6rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;font-weight:600; }
+  .td { padding:.75rem 1rem;font-size:.8rem;border-top:1px solid #14142a; }
+  .modal-bg { position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:center;justify-content:center; }
+  .modal { background:#10101e;border:1px solid #1e1e30;border-radius:1rem;width:100%;max-width:480px;padding:1.5rem; }
+  #toast { position:fixed;bottom:1.5rem;right:1.5rem;z-index:100;transition:all .2s;pointer-events:none; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- TOAST -->
+<div id="toast" class="opacity-0"></div>
+
+<!-- LOGIN ─────────────────────────────────────────────────────────── -->
+<div id="login-screen" class="min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-sm">
+    <div class="flex items-center gap-3 justify-center mb-8">
+      <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center">
+        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <div>
+        <div class="font-bold text-lg">OpenBSP</div>
+        <div class="text-xs text-gray-500">Painel Admin</div>
+      </div>
+    </div>
+    <div class="card p-6">
+      <h2 class="font-semibold text-base mb-4">Entrar como Admin</h2>
+      <div class="space-y-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">E-mail</label><input id="login-email" type="email" placeholder="admin@empresa.com" /></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Senha</label><input id="login-pass" type="password" placeholder="••••••••" /></div>
+        <button onclick="doLogin()" class="btn btn-primary w-full mt-1">Entrar</button>
+        <div id="login-err" class="text-xs text-red-400 text-center hidden"></div>
+      </div>
+    </div>
+    <p class="text-center text-xs text-gray-700 mt-4">Apenas administradores da plataforma têm acesso.</p>
+  </div>
+</div>
+
+<!-- ADMIN APP ─────────────────────────────────────────────────────── -->
+<div id="admin-app" class="hidden flex min-h-screen">
+
+  <!-- Sidebar -->
+  <aside class="w-56 shrink-0 border-r border-[#1a1a2a] flex flex-col" style="background:#09091a">
+    <div class="px-4 py-5 border-b border-[#1a1a2a] flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <div>
+        <div class="text-sm font-semibold">Admin</div>
+        <div class="text-xs text-gray-600">OpenBSP</div>
+      </div>
+    </div>
+
+    <nav class="flex-1 p-3 space-y-0.5">
+      <button onclick="setTab('dashboard')" id="nav-dashboard" class="nav-item nav-active w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button onclick="setTab('orgs')" id="nav-orgs" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        Organizações
+      </button>
+      <button onclick="setTab('plans')" id="nav-plans" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Planos
+      </button>
+      <button onclick="setTab('products')" id="nav-products" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        Produtos
+      </button>
+      <button onclick="setTab('tiers')" id="nav-tiers" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/></svg>
+        Tiers
+      </button>
+      <button onclick="setTab('invoices')" id="nav-invoices" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Faturas
+      </button>
+      <button onclick="setTab('admins')" id="nav-admins" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition text-left">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        Admins
+      </button>
+    </nav>
+
+    <div class="px-3 py-3 border-t border-[#1a1a2a]">
+      <div class="text-xs text-gray-600 px-3 mb-1 truncate" id="admin-email-label"></div>
+      <button onclick="doLogout()" class="w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:text-red-400 hover:bg-white/5 transition">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 overflow-auto">
+
+    <!-- ── DASHBOARD ──────────────────────────────────────────────── -->
+    <div id="tab-dashboard" class="fade-in p-8">
+      <h1 class="text-2xl font-bold mb-1">Dashboard</h1>
+      <p class="text-sm text-gray-500 mb-6">Visão geral da plataforma</p>
+      <div class="grid grid-cols-3 gap-4 mb-8" id="stat-cards">
+        <div class="card p-5"><div class="text-xs text-gray-500 mb-2">Total de Orgs</div><div class="text-3xl font-bold" id="stat-orgs">—</div></div>
+        <div class="card p-5"><div class="text-xs text-gray-500 mb-2">Assinaturas pagas</div><div class="text-3xl font-bold" id="stat-subs">—</div></div>
+        <div class="card p-5"><div class="text-xs text-gray-500 mb-2">MRR</div><div class="text-3xl font-bold text-green-400" id="stat-mrr">—</div></div>
+        <div class="card p-5"><div class="text-xs text-gray-500 mb-2">ARR estimado</div><div class="text-2xl font-bold text-brand-400" id="stat-arr">—</div></div>
+        <div class="card p-5"><div class="text-xs text-gray-500 mb-2">Mensagens este mês</div><div class="text-2xl font-bold" id="stat-msgs">—</div></div>
+        <div class="card p-5"><div class="text-xs text-gray-500 mb-2">Créditos IA este mês</div><div class="text-2xl font-bold text-purple-400" id="stat-ai">—</div></div>
+      </div>
+      <div class="card overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-[#1a1a2a]"><h2 class="text-sm font-semibold">Últimas organizações</h2></div>
+        <div id="dash-orgs-list"></div>
+      </div>
+    </div>
+
+    <!-- ── ORGANIZAÇÕES ───────────────────────────────────────────── -->
+    <div id="tab-orgs" class="hidden fade-in p-8">
+      <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold mb-1">Organizações</h1><p class="text-sm text-gray-500">Todos os tenants da plataforma</p></div>
+      </div>
+      <div class="flex gap-3 mb-4">
+        <input id="org-search" oninput="searchOrgs()" placeholder="Buscar por nome..." class="max-w-xs" />
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full">
+          <thead><tr>
+            <th class="th">Organização</th>
+            <th class="th">Tier</th>
+            <th class="th">Plano</th>
+            <th class="th">Criada em</th>
+            <th class="th"></th>
+          </tr></thead>
+          <tbody id="orgs-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ORG DETAIL (inline) ────────────────────────────────────── -->
+    <div id="tab-org-detail" class="hidden fade-in p-8">
+      <button onclick="setTab('orgs')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-200 mb-5 transition">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        Voltar
+      </button>
+      <div id="org-detail-content"></div>
+    </div>
+
+    <!-- ── PLANOS ─────────────────────────────────────────────────── -->
+    <div id="tab-plans" class="hidden fade-in p-8">
+      <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold mb-1">Planos</h1><p class="text-sm text-gray-500">Gerencie os planos de assinatura</p></div>
+        <button onclick="openPlanModal()" class="btn btn-primary">+ Novo plano</button>
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full">
+          <thead><tr>
+            <th class="th">ID</th>
+            <th class="th">Tier mín.</th>
+            <th class="th">Preço</th>
+            <th class="th">Ciclo</th>
+            <th class="th">Status</th>
+            <th class="th"></th>
+          </tr></thead>
+          <tbody id="plans-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── PRODUTOS ───────────────────────────────────────────────── -->
+    <div id="tab-products" class="hidden fade-in p-8">
+      <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold mb-1">Produtos</h1><p class="text-sm text-gray-500">Unidades mensuráveis de billing</p></div>
+        <button onclick="openProductModal()" class="btn btn-primary">+ Novo produto</button>
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full">
+          <thead><tr>
+            <th class="th">ID</th>
+            <th class="th">Nome</th>
+            <th class="th">Unidade</th>
+            <th class="th">Tipo</th>
+            <th class="th"></th>
+          </tr></thead>
+          <tbody id="products-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TIERS ──────────────────────────────────────────────────── -->
+    <div id="tab-tiers" class="hidden fade-in p-8">
+      <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold mb-1">Tiers</h1><p class="text-sm text-gray-500">Níveis de acesso e limites</p></div>
+        <button onclick="openTierModal()" class="btn btn-primary">+ Novo tier</button>
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full">
+          <thead><tr>
+            <th class="th">ID</th>
+            <th class="th">Nome</th>
+            <th class="th">Nível</th>
+            <th class="th">Status</th>
+            <th class="th"></th>
+          </tr></thead>
+          <tbody id="tiers-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── FATURAS ─────────────────────────────────────────────────── -->
+    <div id="tab-invoices" class="hidden fade-in p-8">
+      <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold mb-1">Faturas</h1><p class="text-sm text-gray-500">Histórico de cobrança</p></div>
+        <div class="flex gap-2 items-center">
+          <input type="month" id="invoice-month" class="max-w-[160px]" />
+          <button onclick="generateInvoices()" class="btn btn-primary">⚡ Gerar faturas</button>
+        </div>
+      </div>
+      <div id="invoice-result" class="mb-4 hidden"></div>
+      <div class="card overflow-hidden">
+        <table class="w-full">
+          <thead><tr>
+            <th class="th">ID</th>
+            <th class="th">Org</th>
+            <th class="th">Período</th>
+            <th class="th">Status</th>
+            <th class="th">Total</th>
+            <th class="th">Criada em</th>
+          </tr></thead>
+          <tbody id="invoices-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ADMINS ──────────────────────────────────────────────────── -->
+    <div id="tab-admins" class="hidden fade-in p-8">
+      <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold mb-1">Administradores</h1><p class="text-sm text-gray-500">Usuários com acesso ao painel admin</p></div>
+        <button onclick="openAdminModal()" class="btn btn-primary">+ Adicionar admin</button>
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full">
+          <thead><tr>
+            <th class="th">E-mail</th>
+            <th class="th">User ID</th>
+            <th class="th">Adicionado em</th>
+            <th class="th"></th>
+          </tr></thead>
+          <tbody id="admins-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MODALS ──────────────────────────────────────────────────────────────── -->
+
+<!-- Plan modal -->
+<div id="modal-plan" class="modal-bg hidden">
+  <div class="modal">
+    <h3 class="font-semibold mb-4" id="plan-modal-title">Novo Plano</h3>
+    <input type="hidden" id="plan-edit-id" />
+    <div class="space-y-3">
+      <div><label class="text-xs text-gray-500 mb-1 block">ID do plano (slug)</label><input id="plan-id" placeholder="ex: starter" /></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Preço (USD)</label><input id="plan-price" type="number" step="0.01" placeholder="0" /></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Ciclo</label>
+          <select id="plan-cycle"><option value="month">Mensal</option><option value="year">Anual</option><option value="">—</option></select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Tier mínimo (nível)</label><input id="plan-tier" type="number" placeholder="0" /></div>
+        <div class="flex items-center gap-3 pt-5">
+          <label class="text-xs text-gray-400 flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="plan-default" class="w-auto" style="width:auto!important;padding:0!important" /> Padrão
+          </label>
+          <label class="text-xs text-gray-400 flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="plan-active" class="w-auto" style="width:auto!important;padding:0!important" checked /> Ativo
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-5">
+      <button onclick="closePlanModal()" class="btn btn-ghost btn-sm">Cancelar</button>
+      <button onclick="savePlan()" class="btn btn-primary btn-sm">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Product modal -->
+<div id="modal-product" class="modal-bg hidden">
+  <div class="modal">
+    <h3 class="font-semibold mb-4" id="product-modal-title">Novo Produto</h3>
+    <input type="hidden" id="product-edit-id" />
+    <div class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">ID (slug)</label><input id="product-id" placeholder="ex: messages" /></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Nome</label><input id="product-name" placeholder="ex: Mensagens" /></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Unidade</label>
+          <select id="product-unit"><option value="count">count</option><option value="gb">gb</option><option value="usd">usd</option></select>
+        </div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Tipo</label>
+          <select id="product-kind"><option value="counter">counter</option><option value="gauge">gauge</option><option value="balance">balance</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-5">
+      <button onclick="closeProductModal()" class="btn btn-ghost btn-sm">Cancelar</button>
+      <button onclick="saveProduct()" class="btn btn-primary btn-sm">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tier modal -->
+<div id="modal-tier" class="modal-bg hidden">
+  <div class="modal">
+    <h3 class="font-semibold mb-4" id="tier-modal-title">Novo Tier</h3>
+    <input type="hidden" id="tier-edit-id" />
+    <div class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">ID (slug)</label><input id="tier-id" placeholder="ex: free" /></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Nome</label><input id="tier-name" placeholder="ex: Free" /></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Nível (0 = menor)</label><input id="tier-level" type="number" placeholder="0" /></div>
+        <div class="flex items-center gap-3 pt-5">
+          <label class="text-xs text-gray-400 flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="tier-active" class="w-auto" style="width:auto!important;padding:0!important" checked /> Ativo
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-5">
+      <button onclick="closeTierModal()" class="btn btn-ghost btn-sm">Cancelar</button>
+      <button onclick="saveTier()" class="btn btn-primary btn-sm">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin modal -->
+<div id="modal-admin" class="modal-bg hidden">
+  <div class="modal">
+    <h3 class="font-semibold mb-4">Adicionar Administrador</h3>
+    <div class="space-y-3">
+      <div><label class="text-xs text-gray-500 mb-1 block">E-mail do usuário</label><input id="admin-new-email" type="email" placeholder="admin@empresa.com" /></div>
+      <p class="text-xs text-gray-600">O usuário precisa ter uma conta Supabase Auth com este e-mail. Caso contrário, o vínculo é feito automaticamente no próximo login.</p>
+    </div>
+    <div class="flex justify-end gap-2 mt-5">
+      <button onclick="closeAdminModal()" class="btn btn-ghost btn-sm">Cancelar</button>
+      <button onclick="saveAdmin()" class="btn btn-primary btn-sm">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change plan modal -->
+<div id="modal-change-plan" class="modal-bg hidden">
+  <div class="modal">
+    <h3 class="font-semibold mb-4">Trocar Plano da Organização</h3>
+    <input type="hidden" id="change-plan-org-id" />
+    <div class="space-y-3">
+      <div><label class="text-xs text-gray-500 mb-1 block">Selecionar novo plano</label>
+        <select id="change-plan-select"></select>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-5">
+      <button onclick="closeChangePlanModal()" class="btn btn-ghost btn-sm">Cancelar</button>
+      <button onclick="doChangePlan()" class="btn btn-primary btn-sm">Confirmar troca</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config & Supabase ─────────────────────────────────────────────────────────
+let cfg = {}, supa, _token = '', _allPlans = []
+const TABS = ['dashboard','orgs','org-detail','plans','products','tiers','invoices','admins']
+
+async function boot() {
+  const res = await fetch('/api/config')
+  cfg = await res.json()
+  supa = supabase.createClient(cfg.url, cfg.anonKey, {
+    auth: { persistSession: true },
+    global: { headers: { apikey: cfg.anonKey } }
+  })
+  const { data: { session } } = await supa.auth.getSession()
+  if (session) await initApp(session)
+  else showLogin()
+}
+
+function showLogin() {
+  document.getElementById('login-screen').classList.remove('hidden')
+  document.getElementById('admin-app').classList.add('hidden')
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim()
+  const pass = document.getElementById('login-pass').value
+  const err = document.getElementById('login-err')
+  err.classList.add('hidden')
+  const { data, error } = await supa.auth.signInWithPassword({ email, password: pass })
+  if (error) { err.textContent = error.message; err.classList.remove('hidden'); return }
+  await initApp(data.session)
+}
+
+async function initApp(session) {
+  _token = session.access_token
+  // Verify admin access
+  const ok = await api('GET', 'stats').catch(() => null)
+  if (ok === null) {
+    await supa.auth.signOut()
+    showLogin()
+    document.getElementById('login-err').textContent = 'Acesso negado: não é administrador.'
+    document.getElementById('login-err').classList.remove('hidden')
+    return
+  }
+  document.getElementById('login-screen').classList.add('hidden')
+  document.getElementById('admin-app').classList.remove('hidden')
+  document.getElementById('admin-app').style.display = 'flex'
+  document.getElementById('admin-email-label').textContent = session.user.email
+  // Set default month
+  const now = new Date()
+  document.getElementById('invoice-month').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`
+  loadDashboard()
+}
+
+async function doLogout() {
+  await supa.auth.signOut()
+  location.reload()
+}
+
+// ── API helper ────────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const fnBase = `${cfg.url}/functions/v1/billing-admin`
+  const res = await fetch(`${fnBase}/${path}`, {
+    method,
+    headers: { 'Authorization': `Bearer ${_token}`, 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }))
+    throw new Error(err.message ?? 'Erro desconhecido')
+  }
+  return res.json()
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function setTab(tab) {
+  TABS.forEach(t => {
+    document.getElementById(`tab-${t}`)?.classList.add('hidden')
+    document.getElementById(`nav-${t}`)?.classList.remove('nav-active')
+  })
+  document.getElementById(`tab-${tab}`)?.classList.remove('hidden')
+  document.getElementById(`nav-${tab}`)?.classList.add('nav-active')
+  if (tab === 'dashboard') loadDashboard()
+  if (tab === 'orgs') loadOrgs()
+  if (tab === 'plans') loadPlans()
+  if (tab === 'products') loadProducts()
+  if (tab === 'tiers') loadTiers()
+  if (tab === 'invoices') loadInvoices()
+  if (tab === 'admins') loadAdmins()
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(msg, isErr = false) {
+  const el = document.getElementById('toast')
+  el.innerHTML = `<div class="px-4 py-2.5 rounded-xl text-sm font-medium shadow-xl ${isErr ? 'bg-red-900/80 text-red-200' : 'bg-[#0ea5e9]/90 text-white'}">${esc(msg)}</div>`
+  el.style.opacity = '1'
+  setTimeout(() => el.style.opacity = '0', 2800)
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+function fmt(s) { return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}) }
+function fmtUSD(n) { return `US$ ${Number(n).toFixed(2)}` }
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [stats, orgs] = await Promise.all([api('GET','stats'), api('GET','orgs')])
+    document.getElementById('stat-orgs').textContent = stats.total_orgs ?? '—'
+    document.getElementById('stat-subs').textContent = stats.active_subscriptions ?? '—'
+    document.getElementById('stat-mrr').textContent = fmtUSD(stats.mrr ?? 0)
+    document.getElementById('stat-arr').textContent = fmtUSD((stats.arr ?? 0) * 12)
+    document.getElementById('stat-msgs').textContent = Number(stats.total_messages_month ?? 0).toLocaleString('pt-BR')
+    document.getElementById('stat-ai').textContent = Number(stats.total_ai_credits_month ?? 0).toFixed(3)
+    renderOrgRows('dash-orgs-list', (orgs ?? []).slice(0, 8), true)
+  } catch(e) { toast(e.message, true) }
+}
+
+// ── ORGS ──────────────────────────────────────────────────────────────────────
+let _orgs = []
+async function loadOrgs() {
+  const tbody = document.getElementById('orgs-table')
+  tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="5">Carregando...</td></tr>'
+  try {
+    _orgs = await api('GET', 'orgs')
+    renderOrgTable(_orgs)
+  } catch(e) { toast(e.message, true) }
+}
+
+function searchOrgs() {
+  const q = document.getElementById('org-search').value.toLowerCase()
+  renderOrgTable(_orgs.filter(o => o.name.toLowerCase().includes(q)))
+}
+
+function renderOrgTable(orgs) {
+  const tbody = document.getElementById('orgs-table')
+  if (!orgs.length) { tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="5">Nenhuma organização.</td></tr>'; return }
+  tbody.innerHTML = orgs.map(o => {
+    const sub = o.subscription
+    const tier = sub?.tier?.name ?? '—'
+    const plan = sub?.plan?.id ?? '—'
+    const price = sub?.plan?.price > 0 ? fmtUSD(sub.plan.price) : 'Grátis'
+    return `<tr>
+      <td class="td font-medium">${esc(o.name)}</td>
+      <td class="td"><span class="badge ${sub?.plan?.price > 0 ? 'badge-paid' : 'badge-free'}">${esc(tier)}</span></td>
+      <td class="td text-gray-400">${esc(plan)} <span class="text-gray-600">${sub ? '· '+price : ''}</span></td>
+      <td class="td text-gray-500">${fmt(o.created_at)}</td>
+      <td class="td text-right">
+        <button onclick="viewOrg('${o.id}')" class="btn btn-ghost btn-sm">Ver</button>
+      </td>
+    </tr>`
+  }).join('')
+}
+
+function renderOrgRows(containerId, orgs, mini = false) {
+  const el = document.getElementById(containerId)
+  if (!orgs.length) { el.innerHTML = '<div class="td text-gray-600">—</div>'; return }
+  el.innerHTML = `<table class="w-full"><tbody>${orgs.map(o => {
+    const sub = o.subscription
+    const tier = sub?.tier?.name ?? '—'
+    return `<tr>
+      <td class="td font-medium">${esc(o.name)}</td>
+      <td class="td"><span class="badge ${sub?.plan?.price > 0 ? 'badge-paid' : 'badge-free'}">${esc(tier)}</span></td>
+      <td class="td text-gray-500">${fmt(o.created_at)}</td>
+      <td class="td text-right"><button onclick="viewOrg('${o.id}')" class="btn btn-ghost btn-sm">Ver</button></td>
+    </tr>`
+  }).join('')}</tbody></table>`
+}
+
+async function viewOrg(id) {
+  setTab('org-detail')
+  const el = document.getElementById('org-detail-content')
+  el.innerHTML = '<div class="text-sm text-gray-600">Carregando...</div>'
+  try {
+    const d = await api('GET', `orgs/${id}`)
+    const sub = d.subscription
+    const planId = sub?.plan?.id
+    // Ensure plans loaded
+    if (!_allPlans.length) _allPlans = await api('GET', 'plans').catch(() => [])
+
+    el.innerHTML = `
+      <div class="flex items-start justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold">${esc(d.org.name)}</h1>
+          <div class="text-xs text-gray-600 mt-0.5">${d.org.id}</div>
+        </div>
+        <button onclick="openChangePlanModal('${id}')" class="btn btn-primary">Trocar plano</button>
+      </div>
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="card p-4"><div class="text-xs text-gray-500 mb-1">Plano</div><div class="font-semibold">${planId ?? '—'}</div></div>
+        <div class="card p-4"><div class="text-xs text-gray-500 mb-1">Tier</div><div class="font-semibold">${sub?.tier?.name ?? '—'}</div></div>
+        <div class="card p-4"><div class="text-xs text-gray-500 mb-1">Desde</div><div class="font-semibold">${fmt(d.org.created_at)}</div></div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="card overflow-hidden">
+          <div class="px-4 py-3 border-b border-[#1a1a2a] text-sm font-semibold">Uso recente (mensal)</div>
+          <table class="w-full">${(d.usage ?? []).length
+            ? d.usage.map(u => `<tr><td class="td text-gray-400">${esc(u.product_id)}</td><td class="td">${u.period}</td><td class="td font-mono">${u.quantity}</td></tr>`).join('')
+            : '<tr><td class="td text-gray-600" colspan="3">Sem dados</td></tr>'
+          }</table>
+        </div>
+        <div class="card overflow-hidden">
+          <div class="px-4 py-3 border-b border-[#1a1a2a] text-sm font-semibold">Últimas faturas</div>
+          <table class="w-full">${(d.invoices ?? []).length
+            ? d.invoices.map(i => `<tr><td class="td"><span class="badge ${i.status==='paid'?'badge-paid-inv':i.status==='issued'?'badge-issued':'badge-draft'}">${i.status}</span></td><td class="td text-gray-400">${fmt(i.period_start)}</td><td class="td font-mono">${fmtUSD(i.subtotal)}</td></tr>`).join('')
+            : '<tr><td class="td text-gray-600" colspan="3">Sem faturas</td></tr>'
+          }</table>
+        </div>
+      </div>`
+  } catch(e) { el.innerHTML = `<div class="text-red-400 text-sm">${esc(e.message)}</div>` }
+}
+
+// Change plan
+function openChangePlanModal(orgId) {
+  document.getElementById('change-plan-org-id').value = orgId
+  const sel = document.getElementById('change-plan-select')
+  sel.innerHTML = _allPlans.map(p => `<option value="${p.id}">${p.id} — ${fmtUSD(p.price)}/${p.billing_cycle ?? '—'}</option>`).join('')
+  document.getElementById('modal-change-plan').classList.remove('hidden')
+}
+function closeChangePlanModal() { document.getElementById('modal-change-plan').classList.add('hidden') }
+async function doChangePlan() {
+  const orgId = document.getElementById('change-plan-org-id').value
+  const planId = document.getElementById('change-plan-select').value
+  try {
+    await api('POST', `orgs/${orgId}/change-plan`, { plan_id: planId })
+    toast('Plano atualizado!')
+    closeChangePlanModal()
+    viewOrg(orgId)
+  } catch(e) { toast(e.message, true) }
+}
+
+// ── PLANS ─────────────────────────────────────────────────────────────────────
+async function loadPlans() {
+  const tbody = document.getElementById('plans-table')
+  tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="6">Carregando...</td></tr>'
+  try {
+    const plans = await api('GET', 'plans')
+    _allPlans = plans
+    if (!plans.length) { tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="6">Nenhum plano.</td></tr>'; return }
+    tbody.innerHTML = plans.map(p => `<tr>
+      <td class="td font-mono text-brand-400">${esc(p.id)}</td>
+      <td class="td">${p.min_tier}</td>
+      <td class="td font-mono">${fmtUSD(p.price)}</td>
+      <td class="td text-gray-400">${p.billing_cycle ?? '—'}</td>
+      <td class="td"><span class="badge ${p.active?'badge-paid':'badge-draft'}">${p.active?'Ativo':'Inativo'}</span>${p.is_default?' <span class="badge badge-free ml-1">padrão</span>':''}</td>
+      <td class="td text-right flex gap-1 justify-end">
+        <button onclick="openPlanModal(${JSON.stringify(p).replace(/"/g,'&quot;')})" class="btn btn-ghost btn-sm">Editar</button>
+        <button onclick="deletePlan('${p.id}')" class="btn btn-danger btn-sm">✕</button>
+      </td>
+    </tr>`).join('')
+  } catch(e) { toast(e.message, true) }
+}
+
+function openPlanModal(plan) {
+  const editing = !!plan?.id
+  document.getElementById('plan-modal-title').textContent = editing ? 'Editar Plano' : 'Novo Plano'
+  document.getElementById('plan-edit-id').value = editing ? plan.id : ''
+  document.getElementById('plan-id').value = editing ? plan.id : ''
+  document.getElementById('plan-id').disabled = editing
+  document.getElementById('plan-price').value = plan?.price ?? ''
+  document.getElementById('plan-cycle').value = plan?.billing_cycle ?? 'month'
+  document.getElementById('plan-tier').value = plan?.min_tier ?? 0
+  document.getElementById('plan-default').checked = plan?.is_default ?? false
+  document.getElementById('plan-active').checked = plan?.active ?? true
+  document.getElementById('modal-plan').classList.remove('hidden')
+}
+function closePlanModal() { document.getElementById('modal-plan').classList.add('hidden') }
+async function savePlan() {
+  const id = document.getElementById('plan-edit-id').value
+  const body = {
+    id: document.getElementById('plan-id').value.trim(),
+    price: parseFloat(document.getElementById('plan-price').value) || 0,
+    billing_cycle: document.getElementById('plan-cycle').value || null,
+    min_tier: parseInt(document.getElementById('plan-tier').value) || 0,
+    is_default: document.getElementById('plan-default').checked,
+    active: document.getElementById('plan-active').checked,
+  }
+  try {
+    if (id) await api('PUT', `plans/${id}`, body)
+    else await api('POST', 'plans', body)
+    toast(id ? 'Plano atualizado!' : 'Plano criado!')
+    closePlanModal(); loadPlans()
+  } catch(e) { toast(e.message, true) }
+}
+async function deletePlan(id) {
+  if (!confirm(`Excluir plano "${id}"?`)) return
+  try { await api('DELETE', `plans/${id}`); toast('Plano excluído!'); loadPlans() }
+  catch(e) { toast(e.message, true) }
+}
+
+// ── PRODUCTS ──────────────────────────────────────────────────────────────────
+async function loadProducts() {
+  const tbody = document.getElementById('products-table')
+  tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="5">Carregando...</td></tr>'
+  try {
+    const prods = await api('GET', 'products')
+    if (!prods.length) { tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="5">Nenhum produto.</td></tr>'; return }
+    tbody.innerHTML = prods.map(p => `<tr>
+      <td class="td font-mono text-brand-400">${esc(p.id)}</td>
+      <td class="td">${esc(p.name)}</td>
+      <td class="td text-gray-400">${p.unit}</td>
+      <td class="td text-gray-400">${p.kind}</td>
+      <td class="td text-right flex gap-1 justify-end">
+        <button onclick="openProductModal(${JSON.stringify(p).replace(/"/g,'&quot;')})" class="btn btn-ghost btn-sm">Editar</button>
+        <button onclick="deleteProduct('${p.id}')" class="btn btn-danger btn-sm">✕</button>
+      </td>
+    </tr>`).join('')
+  } catch(e) { toast(e.message, true) }
+}
+
+function openProductModal(prod) {
+  const editing = !!prod?.id
+  document.getElementById('product-modal-title').textContent = editing ? 'Editar Produto' : 'Novo Produto'
+  document.getElementById('product-edit-id').value = editing ? prod.id : ''
+  document.getElementById('product-id').value = editing ? prod.id : ''
+  document.getElementById('product-id').disabled = editing
+  document.getElementById('product-name').value = prod?.name ?? ''
+  document.getElementById('product-unit').value = prod?.unit ?? 'count'
+  document.getElementById('product-kind').value = prod?.kind ?? 'counter'
+  document.getElementById('modal-product').classList.remove('hidden')
+}
+function closeProductModal() { document.getElementById('modal-product').classList.add('hidden') }
+async function saveProduct() {
+  const id = document.getElementById('product-edit-id').value
+  const body = {
+    id: document.getElementById('product-id').value.trim(),
+    name: document.getElementById('product-name').value.trim(),
+    unit: document.getElementById('product-unit').value,
+    kind: document.getElementById('product-kind').value,
+  }
+  try {
+    if (id) await api('PUT', `products/${id}`, body)
+    else await api('POST', 'products', body)
+    toast(id ? 'Produto atualizado!' : 'Produto criado!')
+    closeProductModal(); loadProducts()
+  } catch(e) { toast(e.message, true) }
+}
+async function deleteProduct(id) {
+  if (!confirm(`Excluir produto "${id}"?`)) return
+  try { await api('DELETE', `products/${id}`); toast('Produto excluído!'); loadProducts() }
+  catch(e) { toast(e.message, true) }
+}
+
+// ── TIERS ─────────────────────────────────────────────────────────────────────
+async function loadTiers() {
+  const tbody = document.getElementById('tiers-table')
+  tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="5">Carregando...</td></tr>'
+  try {
+    const tiers = await api('GET', 'tiers')
+    if (!tiers.length) { tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="5">Nenhum tier.</td></tr>'; return }
+    tbody.innerHTML = tiers.map(t => `<tr>
+      <td class="td font-mono text-brand-400">${esc(t.id)}</td>
+      <td class="td">${esc(t.name)}</td>
+      <td class="td">${t.level}</td>
+      <td class="td"><span class="badge ${t.active?'badge-paid':'badge-draft'}">${t.active?'Ativo':'Inativo'}</span></td>
+      <td class="td text-right flex gap-1 justify-end">
+        <button onclick="openTierModal(${JSON.stringify(t).replace(/"/g,'&quot;')})" class="btn btn-ghost btn-sm">Editar</button>
+        <button onclick="deleteTier('${t.id}')" class="btn btn-danger btn-sm">✕</button>
+      </td>
+    </tr>`).join('')
+  } catch(e) { toast(e.message, true) }
+}
+
+function openTierModal(tier) {
+  const editing = !!tier?.id
+  document.getElementById('tier-modal-title').textContent = editing ? 'Editar Tier' : 'Novo Tier'
+  document.getElementById('tier-edit-id').value = editing ? tier.id : ''
+  document.getElementById('tier-id').value = editing ? tier.id : ''
+  document.getElementById('tier-id').disabled = editing
+  document.getElementById('tier-name').value = tier?.name ?? ''
+  document.getElementById('tier-level').value = tier?.level ?? 0
+  document.getElementById('tier-active').checked = tier?.active ?? true
+  document.getElementById('modal-tier').classList.remove('hidden')
+}
+function closeTierModal() { document.getElementById('modal-tier').classList.add('hidden') }
+async function saveTier() {
+  const id = document.getElementById('tier-edit-id').value
+  const body = {
+    id: document.getElementById('tier-id').value.trim(),
+    name: document.getElementById('tier-name').value.trim(),
+    level: parseInt(document.getElementById('tier-level').value) || 0,
+    active: document.getElementById('tier-active').checked,
+  }
+  try {
+    if (id) await api('PUT', `tiers/${id}`, body)
+    else await api('POST', 'tiers', body)
+    toast(id ? 'Tier atualizado!' : 'Tier criado!')
+    closeTierModal(); loadTiers()
+  } catch(e) { toast(e.message, true) }
+}
+async function deleteTier(id) {
+  if (!confirm(`Excluir tier "${id}"?`)) return
+  try { await api('DELETE', `tiers/${id}`); toast('Tier excluído!'); loadTiers() }
+  catch(e) { toast(e.message, true) }
+}
+
+// ── INVOICES ──────────────────────────────────────────────────────────────────
+async function loadInvoices() {
+  const tbody = document.getElementById('invoices-table')
+  tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="6">Carregando...</td></tr>'
+  try {
+    const invs = await api('GET', 'invoices')
+    if (!invs.length) { tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="6">Nenhuma fatura.</td></tr>'; return }
+    tbody.innerHTML = invs.map(i => `<tr>
+      <td class="td font-mono text-xs text-gray-600">${i.id.slice(0,8)}…</td>
+      <td class="td text-xs text-gray-500 font-mono">${i.organization_id.slice(0,8)}…</td>
+      <td class="td text-gray-400">${i.period_start ? fmt(i.period_start) : '—'}</td>
+      <td class="td"><span class="badge ${i.status==='paid'?'badge-paid-inv':i.status==='issued'?'badge-issued':'badge-draft'}">${i.status}</span></td>
+      <td class="td font-mono">${fmtUSD(i.subtotal)}</td>
+      <td class="td text-gray-500">${fmt(i.created_at)}</td>
+    </tr>`).join('')
+  } catch(e) { toast(e.message, true) }
+}
+
+async function generateInvoices() {
+  const month = document.getElementById('invoice-month').value
+  if (!month) { toast('Selecione o mês', true); return }
+  const resultEl = document.getElementById('invoice-result')
+  resultEl.classList.remove('hidden')
+  resultEl.innerHTML = '<div class="card p-3 text-sm text-gray-400">Gerando faturas...</div>'
+  try {
+    const r = await api('POST', 'invoices/generate', { month })
+    resultEl.innerHTML = `<div class="card p-4 text-sm">
+      <div class="font-semibold mb-2">Faturas geradas para ${esc(r.month)}</div>
+      <div class="grid grid-cols-3 gap-3">
+        <div><div class="text-xs text-gray-500">Geradas</div><div class="text-green-400 font-bold text-xl">${r.generated}</div></div>
+        <div><div class="text-xs text-gray-500">Ignoradas</div><div class="text-gray-400 font-bold text-xl">${r.skipped}</div></div>
+        <div><div class="text-xs text-gray-500">Erros</div><div class="${r.errors>0?'text-red-400':'text-gray-400'} font-bold text-xl">${r.errors}</div></div>
+      </div>
+    </div>`
+    toast(`${r.generated} fatura(s) gerada(s)!`)
+    loadInvoices()
+  } catch(e) { resultEl.innerHTML = `<div class="card p-3 text-sm text-red-400">${esc(e.message)}</div>`; toast(e.message, true) }
+}
+
+// ── PLATFORM ADMINS ───────────────────────────────────────────────────────────
+async function loadAdmins() {
+  const tbody = document.getElementById('admins-table')
+  tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="4">Carregando...</td></tr>'
+  try {
+    const admins = await api('GET', 'admins')
+    if (!admins.length) { tbody.innerHTML = '<tr><td class="td text-gray-600" colspan="4">Nenhum admin.</td></tr>'; return }
+    tbody.innerHTML = admins.map(a => `<tr>
+      <td class="td font-medium">${esc(a.email)}</td>
+      <td class="td font-mono text-xs text-gray-600">${a.user_id ? a.user_id.slice(0,12)+'…' : '—'}</td>
+      <td class="td text-gray-500">${fmt(a.created_at)}</td>
+      <td class="td text-right"><button onclick="deleteAdmin('${a.id}','${esc(a.email)}')" class="btn btn-danger btn-sm">Remover</button></td>
+    </tr>`).join('')
+  } catch(e) { toast(e.message, true) }
+}
+
+function openAdminModal() { document.getElementById('admin-new-email').value = ''; document.getElementById('modal-admin').classList.remove('hidden') }
+function closeAdminModal() { document.getElementById('modal-admin').classList.add('hidden') }
+async function saveAdmin() {
+  const email = document.getElementById('admin-new-email').value.trim()
+  if (!email) return
+  try {
+    await api('POST', 'admins', { email })
+    toast('Administrador adicionado!')
+    closeAdminModal(); loadAdmins()
+  } catch(e) { toast(e.message, true) }
+}
+async function deleteAdmin(id, email) {
+  if (!confirm(`Remover admin "${email}"?`)) return
+  try { await api('DELETE', `admins/${id}`); toast('Admin removido!'); loadAdmins() }
+  catch(e) { toast(e.message, true) }
+}
+
+// Close modals on backdrop click
+['modal-plan','modal-product','modal-tier','modal-admin','modal-change-plan'].forEach(id => {
+  document.getElementById(id).addEventListener('click', (e) => {
+    if (e.target.id === id) document.getElementById(id).classList.add('hidden')
+  })
+})
+
+boot()
+</script>
+</body>
+</html>

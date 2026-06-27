@@ -100,6 +100,10 @@ serve(async (req: Request) => {
     return await serveFile(join(PUBLIC_DIR, "index.html"));
   }
 
+  if (pathname === "/admin" || pathname === "/admin.html") {
+    return await serveFile(join(PUBLIC_DIR, "admin.html"));
+  }
+
   const filePath = join(PUBLIC_DIR, pathname);
   return await serveFile(filePath);
 }, { port: 5000, hostname: "0.0.0.0" });
