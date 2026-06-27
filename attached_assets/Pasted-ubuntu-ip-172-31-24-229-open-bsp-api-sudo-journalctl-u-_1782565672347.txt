@@ -1,0 +1,22 @@
+ubuntu@ip-172-31-24-229:~/open-bsp-api$ sudo journalctl -u openbsp -n 20 --no-pager
+Jun 27 13:07:21 ip-172-31-24-229 systemd[1]: openbsp.service: Scheduled restart job, restart counter is at 5.
+Jun 27 13:07:21 ip-172-31-24-229 systemd[1]: Started openbsp.service - OpenBSP API — Portal e Proxy Deno.
+Jun 27 13:07:21 ip-172-31-24-229 systemd[1]: openbsp.service: Main process exited, code=exited, status=1/FAILURE
+Jun 27 13:07:21 ip-172-31-24-229 systemd[1]: openbsp.service: Failed with result 'exit-code'.
+Jun 27 13:07:26 ip-172-31-24-229 systemd[1]: openbsp.service: Scheduled restart job, restart counter is at 6.
+Jun 27 13:07:26 ip-172-31-24-229 systemd[1]: Started openbsp.service - OpenBSP API — Portal e Proxy Deno.
+Jun 27 13:07:26 ip-172-31-24-229 systemd[1]: openbsp.service: Main process exited, code=exited, status=1/FAILURE
+Jun 27 13:07:26 ip-172-31-24-229 systemd[1]: openbsp.service: Failed with result 'exit-code'.
+Jun 27 13:07:31 ip-172-31-24-229 systemd[1]: openbsp.service: Scheduled restart job, restart counter is at 7.
+Jun 27 13:07:31 ip-172-31-24-229 systemd[1]: Started openbsp.service - OpenBSP API — Portal e Proxy Deno.
+Jun 27 13:07:31 ip-172-31-24-229 systemd[1]: openbsp.service: Main process exited, code=exited, status=1/FAILURE
+Jun 27 13:07:31 ip-172-31-24-229 systemd[1]: openbsp.service: Failed with result 'exit-code'.
+Jun 27 13:07:37 ip-172-31-24-229 systemd[1]: openbsp.service: Scheduled restart job, restart counter is at 8.
+Jun 27 13:07:37 ip-172-31-24-229 systemd[1]: Started openbsp.service - OpenBSP API — Portal e Proxy Deno.
+Jun 27 13:07:37 ip-172-31-24-229 systemd[1]: openbsp.service: Main process exited, code=exited, status=1/FAILURE
+Jun 27 13:07:37 ip-172-31-24-229 systemd[1]: openbsp.service: Failed with result 'exit-code'.
+Jun 27 13:07:42 ip-172-31-24-229 systemd[1]: openbsp.service: Scheduled restart job, restart counter is at 9.
+Jun 27 13:07:42 ip-172-31-24-229 systemd[1]: Started openbsp.service - OpenBSP API — Portal e Proxy Deno.
+Jun 27 13:07:42 ip-172-31-24-229 systemd[1]: openbsp.service: Main process exited, code=exited, status=1/FAILURE
+Jun 27 13:07:42 ip-172-31-24-229 systemd[1]: openbsp.service: Failed with result 'exit-code'.
+ub
