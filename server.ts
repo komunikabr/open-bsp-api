@@ -97,6 +97,10 @@ serve(async (req: Request) => {
   }
 
   if (pathname === "/" || pathname === "/index.html") {
+    return await serveFile(join(PUBLIC_DIR, "lp.html"));
+  }
+
+  if (pathname === "/app" || pathname === "/app.html") {
     return await serveFile(join(PUBLIC_DIR, "index.html"));
   }
 

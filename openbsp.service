@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenBSP API — Portal e Proxy Deno
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/open-bsp-api
+EnvironmentFile=/home/ubuntu/.openbsp.env
+ExecStart=/home/ubuntu/.deno/bin/deno run --allow-net --allow-read --allow-env /home/ubuntu/open-bsp-api/server.ts
+Restart=always
+RestartSec=5
+StandardOutput=append:/home/ubuntu/openbsp.log
+StandardError=append:/home/ubuntu/openbsp.log
+
+[Install]
+WantedBy=multi-user.target

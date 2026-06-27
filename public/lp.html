@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MsgHub — Plataforma de Mensageria Empresarial</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{brand:{50:'#f0f9ff',300:'#7dd3fc',400:'#38bdf8',500:'#0ea5e9',600:'#0284c7',700:'#0369a1',900:'#0c4a6e'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#060612;color:#e2e8f0;font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+  .glow{position:absolute;border-radius:9999px;filter:blur(120px);pointer-events:none;z-index:0}
+  .glow-blue{background:rgba(14,165,233,.18);width:700px;height:700px;top:-200px;left:50%;transform:translateX(-50%)}
+  .glow-purple{background:rgba(139,92,246,.10);width:500px;height:500px;top:300px;right:-100px}
+  .badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);color:#38bdf8;padding:.3rem .9rem;border-radius:9999px;font-size:.75rem;font-weight:600;letter-spacing:.03em}
+  .btn-primary{background:linear-gradient(135deg,#0284c7,#0ea5e9);color:#fff;padding:.75rem 1.75rem;border-radius:.75rem;font-weight:600;font-size:.95rem;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem;cursor:pointer;text-decoration:none;border:none}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(14,165,233,.35)}
+  .btn-ghost{background:transparent;color:#94a3b8;padding:.75rem 1.75rem;border-radius:.75rem;font-weight:500;font-size:.95rem;border:1px solid rgba(255,255,255,.1);transition:all .2s;display:inline-flex;align-items:center;gap:.5rem;cursor:pointer;text-decoration:none}
+  .btn-ghost:hover{color:#e2e8f0;border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.04)}
+  .card{background:linear-gradient(145deg,#0d0d1f,#0a0a18);border:1px solid rgba(255,255,255,.07);border-radius:1rem}
+  .card:hover{border-color:rgba(14,165,233,.2);transform:translateY(-2px);transition:all .25s}
+  .step-num{width:2.5rem;height:2.5rem;background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.25);border-radius:.75rem;display:flex;align-items:center;justify-content:center;font-size:.875rem;font-weight:700;color:#38bdf8;flex-shrink:0}
+  .gradient-text{background:linear-gradient(135deg,#e2e8f0 30%,#38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent)}
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(16px);background:rgba(6,6,18,.7);border-bottom:1px solid rgba(255,255,255,.06)}
+  .feature-icon{width:2.75rem;height:2.75rem;border-radius:.875rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tag{display:inline-block;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#94a3b8;font-size:.7rem;font-weight:500;padding:.15rem .6rem;border-radius:.375rem}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .float{animation:float 5s ease-in-out infinite}
+  @keyframes fadein{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .fadein{animation:fadein .7s ease forwards}
+  .fadein-delay{animation:fadein .7s ease .2s forwards;opacity:0}
+  .fadein-delay2{animation:fadein .7s ease .4s forwards;opacity:0}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+      </div>
+      <span class="font-bold text-white text-lg">MsgHub</span>
+    </a>
+    <div class="hidden md:flex items-center gap-6 text-sm text-gray-400">
+      <a href="#features" class="hover:text-gray-200 transition">Recursos</a>
+      <a href="#how" class="hover:text-gray-200 transition">Como funciona</a>
+      <a href="#plans" class="hover:text-gray-200 transition">Planos</a>
+      <a href="https://github.com/komunikabr/open-bsp-api" target="_blank" class="hover:text-gray-200 transition flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/app" class="btn-ghost text-sm py-2 px-4">Entrar</a>
+      <a href="/app" class="btn-primary text-sm py-2 px-4">Começar grátis</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+  <div class="glow glow-blue"></div>
+  <div class="glow glow-purple"></div>
+
+  <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+    <div class="fadein mb-6">
+      <span class="badge">
+        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10"/></svg>
+        Open Source · WhatsApp & Instagram
+      </span>
+    </div>
+
+    <h1 class="fadein text-5xl md:text-7xl font-black leading-tight mb-6">
+      <span class="gradient-text">Mensageria empresarial</span><br/>
+      pronta para IA
+    </h1>
+
+    <p class="fadein-delay text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+      Plataforma multi-tenant de WhatsApp e Instagram com suporte nativo a AI agents.
+      API-first, open source, construída sobre Supabase e Deno Edge Functions.
+    </p>
+
+    <div class="fadein-delay flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+      <a href="/app" class="btn-primary text-base">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Começar grátis
+      </a>
+      <a href="https://github.com/komunikabr/open-bsp-api" target="_blank" class="btn-ghost text-base">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        Ver no GitHub
+      </a>
+    </div>
+
+    <!-- Floating terminal mockup -->
+    <div class="fadein-delay2 float max-w-2xl mx-auto">
+      <div class="card p-1 shadow-2xl shadow-black/50">
+        <div class="bg-[#080816] rounded-[.75rem] p-5 text-left font-mono text-sm">
+          <div class="flex items-center gap-1.5 mb-4">
+            <div class="w-3 h-3 rounded-full bg-red-500/70"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500/70"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500/70"></div>
+          </div>
+          <div class="space-y-1.5 text-xs md:text-sm">
+            <div><span class="text-gray-600"># Enviar mensagem via API</span></div>
+            <div><span class="text-brand-400">curl</span> <span class="text-green-400">-X POST</span> <span class="text-yellow-300">https://api.msghub.com.br/v1/messages</span> <span class="text-gray-500">\</span></div>
+            <div class="pl-4"><span class="text-green-400">-H</span> <span class="text-orange-300">"api-key: openbsp_live_xxx"</span> <span class="text-gray-500">\</span></div>
+            <div class="pl-4"><span class="text-green-400">-d</span> <span class="text-orange-300">'&#123;"to": "+5511999999999",</span></div>
+            <div class="pl-4 text-orange-300">&nbsp;&nbsp;&nbsp;"body": "Olá! Como posso ajudar?"&#125;'</div>
+            <div class="mt-3 pt-3 border-t border-white/5">
+              <span class="text-gray-500">→ </span><span class="text-green-400">&#123;"id": "msg_abc123", "status": "sent"&#125;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS / TECH -->
+<div class="divider"></div>
+<section class="py-10">
+  <div class="max-w-5xl mx-auto px-6 text-center">
+    <p class="text-xs text-gray-600 uppercase tracking-widest mb-6 font-semibold">Construído sobre tecnologias sólidas</p>
+    <div class="flex flex-wrap items-center justify-center gap-8 text-gray-600 text-sm font-medium">
+      <span class="flex items-center gap-2"><svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm.75 18.188l-5.25-5.25 1.061-1.061 4.189 4.189 8.25-8.25 1.061 1.061-9.311 9.311z"/></svg>Supabase</span>
+      <span class="flex items-center gap-2"><svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 12h8M12 8v8"/></svg>Deno</span>
+      <span class="flex items-center gap-2"><svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>PostgreSQL + RLS</span>
+      <span class="flex items-center gap-2"><svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 16.5c-.284.777-1.404 1.408-1.902 1.49-.498.081-1.091.112-1.762-.117-.415-.142-.967-.322-1.663-.627-2.928-1.264-4.836-4.244-4.981-4.441-.145-.197-1.187-1.589-1.187-3.032s.756-2.156 1.024-2.451c.268-.295.583-.369.777-.369.194 0 .389.002.559.01.18.009.421-.068.658.499.246.59.836 2.047.909 2.195.073.147.122.318-.006.511-.128.193-.192.314-.385.484-.192.17-.4.379-.571.51-.17.131-.348.272-.15.537.2.266 1.31 1.853 2.41 2.66.854.618 1.574.952 1.97 1.088.397.136.636.114.872-.049.237-.162.78-.698.988-.961.208-.263.41-.22.688-.132.278.088 1.773.836 2.075.989.302.152.503.228.577.355.074.126.074.732-.21 1.507z"/></svg>WhatsApp Business API</span>
+      <span class="flex items-center gap-2"><svg class="w-5 h-5 text-pink-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>Instagram</span>
+      <span class="flex items-center gap-2"><svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>AI Agents (MCP + A2A)</span>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section id="features" class="py-24">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <p class="text-brand-400 text-sm font-semibold uppercase tracking-widest mb-3">Recursos</p>
+      <h2 class="text-4xl font-bold gradient-text mb-4">Tudo que você precisa</h2>
+      <p class="text-gray-500 max-w-xl mx-auto">Uma stack completa para construir produtos de mensageria com WhatsApp e Instagram de forma profissional.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <div class="card p-6 transition-all duration-300">
+        <div class="feature-icon bg-green-500/10 mb-4">
+          <svg class="w-6 h-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Multi-tenant nativo</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Cada organização tem seu próprio namespace isolado com RLS do Postgres. Dados 100% segregados sem código adicional.</p>
+      </div>
+
+      <div class="card p-6 transition-all duration-300">
+        <div class="feature-icon bg-blue-500/10 mb-4">
+          <svg class="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">API Key + JWT</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Dois modos de autenticação que coexistem. Usuários humanos via JWT, AI agents e integrações via API Key.</p>
+      </div>
+
+      <div class="card p-6 transition-all duration-300">
+        <div class="feature-icon bg-purple-500/10 mb-4">
+          <svg class="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">AI-ready (MCP + A2A)</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Model Context Protocol e Agent-to-Agent protocol nativos. Seus AI agents se conectam à plataforma sem código extra.</p>
+      </div>
+
+      <div class="card p-6 transition-all duration-300">
+        <div class="feature-icon bg-yellow-500/10 mb-4">
+          <svg class="w-6 h-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Edge Functions Deno</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Webhooks, dispatcher, gerenciamento e pré-processamento de mídia rodando em Edge Functions com latência mínima.</p>
+      </div>
+
+      <div class="card p-6 transition-all duration-300">
+        <div class="feature-icon bg-cyan-500/10 mb-4">
+          <svg class="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Billing integrado</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Schema de billing completo: planos, tiers, uso por produto, créditos IA, faturas e pagamentos. Pronto para monetizar.</p>
+      </div>
+
+      <div class="card p-6 transition-all duration-300">
+        <div class="feature-icon bg-red-500/10 mb-4">
+          <svg class="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Painel Admin</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Interface administrativa para gerenciar organizações, planos, produtos, tiers, faturas e administradores da plataforma.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="py-24">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <p class="text-brand-400 text-sm font-semibold uppercase tracking-widest mb-3">Como funciona</p>
+      <h2 class="text-4xl font-bold gradient-text mb-4">Em 3 passos</h2>
+    </div>
+
+    <div class="space-y-8">
+      <div class="flex gap-6 items-start card p-6">
+        <div class="step-num">1</div>
+        <div>
+          <h3 class="font-semibold mb-2">Crie sua organização e conecte o WhatsApp</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Registre-se no portal, crie sua organização e vincule seu número WhatsApp Business via Meta Business API. Suporte a múltiplos números por org.</p>
+          <div class="flex gap-2 mt-3"><span class="tag">Meta API</span><span class="tag">Multi-número</span><span class="tag">Instagram</span></div>
+        </div>
+      </div>
+
+      <div class="flex gap-6 items-start card p-6">
+        <div class="step-num">2</div>
+        <div>
+          <h3 class="font-semibold mb-2">Integre via API Key em minutos</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Gere uma API Key no portal e comece a enviar mensagens, gerenciar conversas e receber webhooks em tempo real. SDK disponível para JS e Python.</p>
+          <div class="flex gap-2 mt-3"><span class="tag">REST API</span><span class="tag">Webhooks</span><span class="tag">Tempo real</span></div>
+        </div>
+      </div>
+
+      <div class="flex gap-6 items-start card p-6">
+        <div class="step-num">3</div>
+        <div>
+          <h3 class="font-semibold mb-2">Conecte seus AI Agents via MCP</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Use o protocolo MCP para dar aos seus LLMs acesso direto às conversas, mensagens e contatos. Compatível com Claude, GPT-4 e qualquer agent A2A.</p>
+          <div class="flex gap-2 mt-3"><span class="tag">MCP</span><span class="tag">A2A Protocol</span><span class="tag">Claude · GPT-4</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PLANS -->
+<section id="plans" class="py-24">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <p class="text-brand-400 text-sm font-semibold uppercase tracking-widest mb-3">Planos</p>
+      <h2 class="text-4xl font-bold gradient-text mb-4">Simples e transparente</h2>
+      <p class="text-gray-500">Comece grátis, escale conforme crescer.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <div class="card p-6">
+        <div class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Free</div>
+        <div class="text-4xl font-black mb-1">$0</div>
+        <div class="text-sm text-gray-600 mb-6">para sempre</div>
+        <ul class="space-y-3 text-sm text-gray-400">
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>1.000 mensagens/mês</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>1 número WhatsApp</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>API Key</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Webhooks</li>
+        </ul>
+        <a href="/app" class="btn-ghost w-full justify-center mt-6 text-sm py-2.5">Começar grátis</a>
+      </div>
+
+      <div class="card p-6 relative" style="border-color:rgba(14,165,233,.35);background:linear-gradient(145deg,#0d1828,#0a0a18)">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-full">POPULAR</div>
+        <div class="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-3">Pro</div>
+        <div class="text-4xl font-black mb-1">$49</div>
+        <div class="text-sm text-gray-600 mb-6">/mês</div>
+        <ul class="space-y-3 text-sm text-gray-400">
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>50.000 mensagens/mês</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>5 números WhatsApp</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Instagram integrado</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>AI Agent (MCP)</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>$5 créditos IA inclusos</li>
+        </ul>
+        <a href="/app" class="btn-primary w-full justify-center mt-6 text-sm py-2.5">Começar agora</a>
+      </div>
+
+      <div class="card p-6">
+        <div class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Enterprise</div>
+        <div class="text-4xl font-black mb-1">Custom</div>
+        <div class="text-sm text-gray-600 mb-6">fale conosco</div>
+        <ul class="space-y-3 text-sm text-gray-400">
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Volume ilimitado</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>SLA garantido</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Deploy dedicado</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Suporte prioritário</li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>White-label</li>
+        </ul>
+        <a href="mailto:contato@msghub.com.br" class="btn-ghost w-full justify-center mt-6 text-sm py-2.5">Falar com vendas</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA FINAL -->
+<section class="py-24 relative overflow-hidden">
+  <div class="glow" style="background:rgba(14,165,233,.12);width:600px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+  <div class="relative z-10 max-w-2xl mx-auto px-6 text-center">
+    <h2 class="text-4xl md:text-5xl font-black gradient-text mb-4">Pronto para começar?</h2>
+    <p class="text-gray-500 mb-8">Crie sua conta gratuitamente e envie sua primeira mensagem em minutos.</p>
+    <a href="/app" class="btn-primary text-base px-8 py-4">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Criar conta grátis
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 py-10">
+  <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2.5">
+      <div class="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+      </div>
+      <span class="font-semibold text-sm text-gray-300">MsgHub</span>
+    </div>
+    <p class="text-xs text-gray-700">© 2025 MsgHub · Plataforma de Mensageria Empresarial · Open Source</p>
+    <div class="flex items-center gap-5 text-xs text-gray-600">
+      <a href="/app" class="hover:text-gray-400 transition">Portal</a>
+      <a href="/admin" class="hover:text-gray-400 transition">Admin</a>
+      <a href="https://github.com/komunikabr/open-bsp-api" target="_blank" class="hover:text-gray-400 transition">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Smooth scroll para âncoras
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault()
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' })
+  })
+})
+</script>
+</body>
+</html>

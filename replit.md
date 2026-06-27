@@ -61,20 +61,72 @@ O usuário desenvolve no Replit (edição de código) e implanta no VPS próprio
 
 ---
 
+## Rotas do servidor
+
+| Rota | Arquivo servido | Descrição |
+|---|---|---|
+| `/` | `public/lp.html` | Landing Page pública |
+| `/app` | `public/index.html` | Portal do desenvolvedor |
+| `/admin` | `public/admin.html` | Painel admin da plataforma |
+| `/api/config` | — | Retorna `{ url, anonKey, apiBaseUrl }` |
+| `/proxy/*` | — | Proxy transparente para o Supabase |
+
 ## Workflow do Replit
 
 **Comando:** `deno run --allow-net --allow-read --allow-env server.ts`  
 **Porta:** 5000
 
-O `server.ts` faz três coisas:
+O `server.ts` faz quatro coisas:
 1. Serve os arquivos estáticos de `./public/`
 2. Expõe `GET /api/config` → retorna `{ url, anonKey }` do Supabase (lido das env vars)
 3. Faz proxy de `GET|POST|... /proxy/*` → repassa para o Supabase hospedado
+4. Serve `/` como Landing Page, `/app` como portal, `/admin` como painel admin
 
 ```
+Browser → /               → server.ts → public/lp.html (Landing Page)
+Browser → /app            → server.ts → public/index.html (Portal)
+Browser → /admin          → server.ts → public/admin.html (Admin)
 Browser → /api/config     → server.ts → retorna SUPABASE_URL + SUPABASE_ANON_KEY
 Browser → /proxy/rest/v1/ → server.ts → SUPABASE_URL/rest/v1/ (proxy transparente)
-Browser → /               → server.ts → public/index.html
+```
+
+## Deploy no VPS (EC2 Ubuntu)
+
+### Primeira vez
+```bash
+git clone https://github.com/komunikabr/open-bsp-api.git
+cd open-bsp-api
+chmod +x update.sh
+
+# Criar arquivo de variáveis
+echo 'export SUPABASE_URL=https://topqsebrohuydnqvtooc.supabase.co' >> ~/.openbsp.env
+echo 'export SUPABASE_ANON_KEY=<sua-chave>' >> ~/.openbsp.env
+
+./update.sh
+```
+
+### Atualizar depois
+```bash
+cd ~/open-bsp-api && ./update.sh
+```
+
+### Manter rodando com systemd (recomendado para produção)
+```bash
+sudo cp openbsp.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable openbsp
+sudo systemctl start openbsp
+# Ver status:
+sudo systemctl status openbsp
+```
+
+### Deploy das Edge Functions (Supabase Cloud)
+```bash
+supabase link --project-ref topqsebrohuydnqvtooc
+supabase functions deploy billing-admin
+supabase functions deploy billing
+supabase functions deploy billing-invoicer
+supabase db push
 ```
 
 ---
