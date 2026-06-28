@@ -458,7 +458,7 @@ async function initApp(session) {
   }
 
   if (!ok) {
-    await supa.auth.signOut()
+    await supa.auth.signOut({ scope: 'local' })
     showLogin()
     document.getElementById('login-err').textContent = errMsg || 'Erro desconhecido.'
     document.getElementById('login-err').classList.remove('hidden')
@@ -475,7 +475,7 @@ async function initApp(session) {
 }
 
 async function doLogout() {
-  await supa.auth.signOut()
+  await supa.auth.signOut({ scope: 'local' })
   location.reload()
 }
 
