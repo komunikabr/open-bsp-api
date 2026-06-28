@@ -919,13 +919,9 @@ window.handleSignUp = async () => {
 }
 
 window.handleSignOut = async () => {
-  const { error } = await supa.auth.signOut({ scope: 'local' })
-  if (error) {
-    showToast('Erro ao sair: ' + error.message, true)
-  } else {
-    showV('login')
-    showLogin()
-  }
+  await supa.auth.signOut({ scope: 'local' }).catch(() => {})
+  showV('login')
+  showLogin()
 }
 window.showLogin  = () => { $('login-form').classList.remove('hidden'); $('signup-form').classList.add('hidden') }
 window.showSignUp = () => { $('signup-form').classList.remove('hidden'); $('login-form').classList.add('hidden') }
