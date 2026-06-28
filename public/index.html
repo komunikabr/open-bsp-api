@@ -919,7 +919,7 @@ window.handleSignUp = async () => {
 }
 
 window.handleSignOut = async () => {
-  const { error } = await supa.auth.signOut()
+  const { error } = await supa.auth.signOut({ scope: 'local' })
   if (error) {
     showToast('Erro ao sair: ' + error.message, true)
   } else {
