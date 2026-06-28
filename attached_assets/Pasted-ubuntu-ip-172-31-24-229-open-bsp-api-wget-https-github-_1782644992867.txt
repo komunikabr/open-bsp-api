@@ -1,0 +1,27 @@
+ubuntu@ip-172-31-24-229:~/open-bsp-api$ wget https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz
+--2026-06-28 11:09:31--  https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz
+Resolving github.com (github.com)... 140.82.112.4
+Connecting to github.com (github.com)|140.82.112.4|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://github.com/supabase/cli/releases/download/v2.108.0/supabase_linux_amd64.tar.gz [following]
+--2026-06-28 11:09:31--  https://github.com/supabase/cli/releases/download/v2.108.0/supabase_linux_amd64.tar.gz
+Reusing existing connection to github.com:443.
+HTTP request sent, awaiting response... 302 Found
+Location: https://release-assets.githubusercontent.com/github-production-release-asset/314160187/40d57efb-57be-4c3d-8b52-6af9926c4ace?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-06-28T12%3A09%3A43Z&rscd=attachment%3B+filename%3Dsupabase_linux_amd64.tar.gz&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-06-28T11%3A08%3A57Z&ske=2026-06-28T12%3A09%3A43Z&sks=b&skv=2018-11-09&sig=vkTWjb5KGwa1vo5DZnBy48xNLkrWeEyrqGMp%2FiLrc9k%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc4MjY0Njc3MSwibmJmIjoxNzgyNjQ0OTcxLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.bANr9pLq559vysqE42ir_6e_4w4ooZe_WKBrRCxWVuc&response-content-disposition=attachment%3B%20filename%3Dsupabase_linux_amd64.tar.gz&response-content-type=application%2Foctet-stream [following]
+--2026-06-28 11:09:31--  https://release-assets.githubusercontent.com/github-production-release-asset/314160187/40d57efb-57be-4c3d-8b52-6af9926c4ace?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-06-28T12%3A09%3A43Z&rscd=attachment%3B+filename%3Dsupabase_linux_amd64.tar.gz&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-06-28T11%3A08%3A57Z&ske=2026-06-28T12%3A09%3A43Z&sks=b&skv=2018-11-09&sig=vkTWjb5KGwa1vo5DZnBy48xNLkrWeEyrqGMp%2FiLrc9k%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc4MjY0Njc3MSwibmJmIjoxNzgyNjQ0OTcxLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.bANr9pLq559vysqE42ir_6e_4w4ooZe_WKBrRCxWVuc&response-content-disposition=attachment%3B%20filename%3Dsupabase_linux_amd64.tar.gz&response-content-type=application%2Foctet-stream
+Resolving release-assets.githubusercontent.com (release-assets.githubusercontent.com)... 185.199.110.133, 185.199.111.133, 185.199.108.133, ...
+Connecting to release-assets.githubusercontent.com (release-assets.githubusercontent.com)|185.199.110.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 73333284 (70M) [application/octet-stream]
+Saving to: ‘supabase_linux_amd64.tar.gz’
+
+supabase_linux_amd64.tar.gz                          100%[====================================================================================================================>]  69.94M   137MB/s    in 0.5s
+
+2026-06-28 11:09:31 (137 MB/s) - ‘supabase_linux_amd64.tar.gz’ saved [73333284/73333284]
+
+ubuntu@ip-172-31-24-229:~/open-bsp-api$ tar -xf supabase_linux_amd64.tar.gz
+sudo mv supabase /usr/local/bin/
+tar: supabase: Cannot open: File exists
+tar: Exiting with failure status due to previous errors
+ubuntu@ip-172-31-24-229:~/open-bsp-api$
+
