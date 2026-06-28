@@ -918,7 +918,15 @@ window.handleSignUp = async () => {
   await supa.auth.signInWithPassword({ email, password: pw })
 }
 
-window.handleSignOut = async () => await supa.auth.signOut()
+window.handleSignOut = async () => {
+  const { error } = await supa.auth.signOut()
+  if (error) {
+    showToast('Erro ao sair: ' + error.message, true)
+  } else {
+    showV('login')
+    showLogin()
+  }
+}
 window.showLogin  = () => { $('login-form').classList.remove('hidden'); $('signup-form').classList.add('hidden') }
 window.showSignUp = () => { $('signup-form').classList.remove('hidden'); $('login-form').classList.add('hidden') }
 
